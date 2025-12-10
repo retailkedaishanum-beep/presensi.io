@@ -169,6 +169,21 @@
         </svg>
        </div>
        <h2 class="text-2xl font-bold text-gray-800">Kelola Data Siswa</h2>
+      </div><!-- Kelola Kelas -->
+      <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-6 mb-6">
+       <div class="flex items-start space-x-4">
+        <div class="bg-indigo-600 rounded-lg p-3 flex-shrink-0">
+         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+         </svg>
+        </div>
+        <div class="flex-1">
+         <h3 class="text-xl font-bold text-gray-800 mb-2">📚 Kelola Kelas</h3>
+         <p class="text-sm text-gray-600 mb-4">Tambah kelas baru untuk mengorganisir data siswa per tingkat</p>
+         <div class="flex gap-3 mb-4"><input type="text" id="newClassName" placeholder="Nama Kelas (contoh: KELAS X (SEPULUH))" class="flex-1 px-4 py-2 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500"> <button onclick="addClass()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg whitespace-nowrap"> ➕ Tambah Kelas </button>
+         </div>
+         <div id="classList" class="flex flex-wrap gap-2"></div>
+        </div>
+       </div>
       </div><!-- Kelola Jurusan -->
       <div class="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-200 rounded-xl p-6 mb-6">
        <div class="flex items-start space-x-4">
@@ -203,7 +218,7 @@
        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center space-x-2"><span>📥</span> <span>Import Data dari Excel</span></h3>
        <p class="text-sm text-gray-600 mb-4">Upload file Excel yang sudah diisi. Pilih kelas terlebih dahulu sebelum upload.</p>
        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-        <div><label for="importClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas <span class="text-red-500">*</span></label> <select id="importClass" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Kelas --</option> <option value="X">KELAS X (SEPULUH)</option> <option value="XI">KELAS XI (SEBELAS)</option> <option value="XII">KELAS XII (DUA BELAS)</option> </select>
+        <div><label for="importClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas <span class="text-red-500">*</span></label> <select id="importClass" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
          <p class="text-xs text-gray-500 mt-1">⚠️ Wajib pilih kelas</p>
         </div>
         <div><label for="importMajor" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Jurusan <span class="text-red-500">*</span></label> <select id="importMajor" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Jurusan --</option> </select>
@@ -479,6 +494,7 @@
       updateStats();
       populateClassDropdowns();
       populateMajorDropdowns();
+      renderClassList();
       renderMajorList();
       populateRecapDropdowns();
       
@@ -590,6 +606,98 @@
       } catch (error) {
         console.error('Error adding major:', error);
         showToast('❌ Gagal menambah jurusan: ' + error.message, 'error');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Add class to Supabase
+    async function addClass() {
+      const nameInput = document.getElementById('newClassName');
+      const className = nameInput.value.trim();
+      
+      if (!className) {
+        showToast('Masukkan nama kelas', 'error');
+        return;
+      }
+      
+      showLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('classes')
+          .insert([
+            { class_name: className }
+          ])
+          .select();
+        
+        if (error) throw error;
+        
+        await loadClasses();
+        updateUI();
+        
+        nameInput.value = '';
+        showToast('✅ Kelas berhasil ditambahkan!', 'success');
+      } catch (error) {
+        console.error('Error adding class:', error);
+        showToast('❌ Gagal menambah kelas: ' + error.message, 'error');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Render class list
+    function renderClassList() {
+      const container = document.getElementById('classList');
+      
+      if (classesData.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada kelas. Tambahkan kelas untuk mengorganisir data siswa.</p>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      classesData.forEach(classItem => {
+        const studentsInClass = studentsData.filter(s => s.class_id === classItem.id);
+        
+        const badge = document.createElement('div');
+        badge.className = 'bg-indigo-100 border border-indigo-300 text-indigo-800 px-4 py-2 rounded-lg flex items-center gap-2';
+        badge.innerHTML = `
+          <span class="font-semibold">${classItem.class_name}</span>
+          <span class="bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded text-xs font-bold">${studentsInClass.length} siswa</span>
+          <button onclick="deleteClass('${classItem.id}')" class="text-indigo-600 hover:text-indigo-800 font-bold">
+            ✕
+          </button>
+        `;
+        container.appendChild(badge);
+      });
+    }
+
+    // Delete class
+    async function deleteClass(classId) {
+      const studentsInClass = studentsData.filter(s => s.class_id === classId);
+      
+      if (studentsInClass.length > 0) {
+        showToast(`Tidak bisa hapus! Ada ${studentsInClass.length} siswa di kelas ini`, 'error');
+        return;
+      }
+      
+      showLoading(true);
+      
+      try {
+        const { error } = await supabase
+          .from('classes')
+          .delete()
+          .eq('id', classId);
+        
+        if (error) throw error;
+        
+        await loadClasses();
+        updateUI();
+        
+        showToast('✅ Kelas berhasil dihapus!', 'success');
+      } catch (error) {
+        console.error('Error deleting class:', error);
+        showToast('❌ Gagal menghapus kelas: ' + error.message, 'error');
       } finally {
         showLoading(false);
       }
@@ -1647,5 +1755,5 @@
     // Initialize app
     initializeApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab9765cc4ff4ab2',t:'MTc2NTMzNTMxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab983ef21bf4ab2',t:'MTc2NTMzNTg3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
