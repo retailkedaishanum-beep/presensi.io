@@ -30,6 +30,7 @@
     
     .status-btn {
       transition: all 0.2s;
+      cursor: pointer;
     }
     
     .status-btn:hover {
@@ -40,7 +41,6 @@
     .status-S { background: #f59e0b; }
     .status-I { background: #3b82f6; }
     .status-A { background: #ef4444; }
-    .status-PKL { background: #8b5cf6; }
     
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -73,13 +73,18 @@
     .confirmation-modal {
       animation: slideIn 0.3s ease-out;
     }
+
+    .status-selected {
+      ring: 4px;
+      opacity: 1 !important;
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100">
-  <div class="h-full w-full flex flex-col overflow-auto"><!-- Modern Header -->
+  <div class="h-full w-full flex flex-col overflow-auto"><!-- Header -->
    <header class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-xl">
     <div class="max-w-7xl mx-auto px-4 py-6">
      <div class="flex items-center justify-between">
@@ -105,7 +110,7 @@
       </div>
      </div>
     </div>
-   </header><!-- Modern Tab Navigation -->
+   </header><!-- Tab Navigation -->
    <nav class="bg-white shadow-md">
     <div class="max-w-7xl mx-auto px-4 py-4">
      <div class="flex space-x-3"><button onclick="switchTab('input')" id="tab-input" class="tab-active flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all">
@@ -131,16 +136,19 @@
        <h2 class="text-2xl font-bold text-gray-800">Input Presensi Harian</h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-       <div><label for="inputClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="inputClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
+       <div><select id="inputClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
        </div>
-       <div><label for="inputDate" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label> <input type="date" id="inputDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+       <div><input type="date" id="inputDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
        </div>
       </div><!-- Legend -->
       <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
        <p class="text-sm font-semibold text-gray-700 mb-2">📌 Keterangan Status:</p>
        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-green-500"></div><span class="text-xs text-gray-700"><strong>H</strong> = Hadir</span>
+         <div class="w-8 h-8 rounded bg-green-500"></div><span class="text-xs text-gray-700"><strong>H</strong> = Hadir (default, kolom kosong di Excel)</span>
+        </div>
+        <div class="flex items-center gap-2">
+         <div class="w-8 h-8 rounded bg-purple-500"></div><span class="text-xs text-gray-700"><strong>PKL</strong> = Praktek Kerja Lapangan (dihitung Hadir)</span>
         </div>
         <div class="flex items-center gap-2">
          <div class="w-8 h-8 rounded bg-yellow-500"></div><span class="text-xs text-gray-700"><strong>S</strong> = Sakit</span>
@@ -149,10 +157,7 @@
          <div class="w-8 h-8 rounded bg-blue-500"></div><span class="text-xs text-gray-700"><strong>I</strong> = Izin</span>
         </div>
         <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-red-500"></div><span class="text-xs text-gray-700"><strong>A</strong> = Alpa</span>
-        </div>
-        <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-purple-500"></div><span class="text-xs text-gray-700"><strong>PKL</strong> = Praktik Kerja Lapangan</span>
+         <div class="w-8 h-8 rounded bg-red-500"></div><span class="text-xs text-gray-700"><strong>A</strong> = Alpha (Tanpa Keterangan)</span>
         </div>
        </div>
       </div>
@@ -169,37 +174,7 @@
         </svg>
        </div>
        <h2 class="text-2xl font-bold text-gray-800">Kelola Data Siswa</h2>
-      </div><!-- Kelola Kelas -->
-      <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-6 mb-6">
-       <div class="flex items-start space-x-4">
-        <div class="bg-indigo-600 rounded-lg p-3 flex-shrink-0">
-         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-         </svg>
-        </div>
-        <div class="flex-1">
-         <h3 class="text-xl font-bold text-gray-800 mb-2">📚 Kelola Kelas</h3>
-         <p class="text-sm text-gray-600 mb-4">Tambah kelas baru untuk mengorganisir data siswa per tingkat</p>
-         <div class="flex gap-3 mb-4"><input type="text" id="newClassName" placeholder="Nama Kelas (contoh: KELAS X (SEPULUH))" class="flex-1 px-4 py-2 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500"> <button onclick="addClass()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg whitespace-nowrap"> ➕ Tambah Kelas </button>
-         </div>
-         <div id="classList" class="flex flex-wrap gap-2"></div>
-        </div>
-       </div>
-      </div><!-- Kelola Jurusan -->
-      <div class="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-200 rounded-xl p-6 mb-6">
-       <div class="flex items-start space-x-4">
-        <div class="bg-cyan-600 rounded-lg p-3 flex-shrink-0">
-         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-         </svg>
-        </div>
-        <div class="flex-1">
-         <h3 class="text-xl font-bold text-gray-800 mb-2">🏫 Kelola Jurusan</h3>
-         <p class="text-sm text-gray-600 mb-4">Tambah jurusan baru untuk mengorganisir data siswa per jurusan</p>
-         <div class="flex gap-3 mb-4"><input type="text" id="newMajorCode" placeholder="Kode (contoh: TKJ)" class="w-32 px-4 py-2 border border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500"> <input type="text" id="newMajorName" placeholder="Nama Lengkap Jurusan" class="flex-1 px-4 py-2 border border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500"> <button onclick="addMajor()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg"> ➕ Tambah Jurusan </button>
-         </div>
-         <div id="majorList" class="flex flex-wrap gap-2"></div>
-        </div>
-       </div>
-      </div><!-- Template Data Siswa -->
+      </div><!-- Download Template -->
       <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 mb-6">
        <div class="flex items-start space-x-4">
         <div class="bg-purple-600 rounded-lg p-3 flex-shrink-0">
@@ -207,8 +182,16 @@
          </svg>
         </div>
         <div class="flex-1">
-         <h3 class="text-xl font-bold text-gray-800 mb-2">📄 Template Data Siswa</h3>
-         <p class="text-sm text-gray-600 mb-4">Download template Excel untuk mempermudah input data siswa dalam jumlah banyak. Template sudah berisi format yang sesuai dengan sistem.</p><button onclick="downloadTemplate()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center space-x-2">
+         <h3 class="text-xl font-bold text-gray-800 mb-2">📄 Download Template Excel</h3>
+         <p class="text-sm text-gray-600 mb-4">Download template Excel untuk import data siswa. Template ini sudah berisi format standar SMK NEGERI 4 JAKARTA dengan kolom: NO, NIS, NAMA, L/P.</p>
+         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+          <p class="text-sm text-yellow-800"><strong>⚠️ Cara Penggunaan:</strong><br>
+            1. Download template di bawah ini<br>
+            2. Isi data siswa mulai baris 11 (hapus data contoh)<br>
+            3. Pastikan format NIS, NAMA, dan L/P sudah benar<br>
+            4. Simpan file Excel<br>
+            5. Upload kembali ke sistem menggunakan form Import Data di bawah</p>
+         </div><button onclick="downloadTemplate()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center space-x-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg><span>Download Template Excel</span> </button>
         </div>
@@ -216,15 +199,12 @@
       </div><!-- Import Excel -->
       <div class="bg-blue-50 border-2 border-dashed border-blue-300 rounded-xl p-6 mb-6">
        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center space-x-2"><span>📥</span> <span>Import Data dari Excel</span></h3>
-       <p class="text-sm text-gray-600 mb-4">Upload file Excel yang sudah diisi. Pilih kelas terlebih dahulu sebelum upload.</p>
-       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-        <div><label for="importClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas <span class="text-red-500">*</span></label> <select id="importClass" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
-         <p class="text-xs text-gray-500 mt-1">⚠️ Wajib pilih kelas</p>
+       <p class="text-sm text-gray-600 mb-4">Upload file Excel yang sudah diisi dengan data siswa. Pastikan formatnya sesuai dengan template.</p>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <input type="text" id="importClassName" placeholder="Contoh: XI - TKP-1" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+         <p class="text-xs text-gray-500 mt-1">⚠️ Format: TINGKAT - JURUSAN-NOMOR (contoh: XI - TKR-1)</p>
         </div>
-        <div><label for="importMajor" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Jurusan <span class="text-red-500">*</span></label> <select id="importMajor" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Jurusan --</option> </select>
-         <p class="text-xs text-gray-500 mt-1">⚠️ Wajib pilih jurusan</p>
-        </div>
-        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Upload File</label> <input type="file" id="excelFile" accept=".xlsx,.xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih File Excel</label> <input type="file" id="excelFile" accept=".xlsx,.xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all">
         </div>
        </div><button onclick="importExcel()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all"> ⬆️ Upload &amp; Import Data </button>
       </div><!-- Manual Add Student -->
@@ -237,9 +217,7 @@
         </div>
         <div><label for="addGender" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin</label> <select id="addGender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"> <option value="">-- Pilih --</option> <option value="L">Laki-laki</option> <option value="P">Perempuan</option> </select>
         </div>
-        <div><label for="addClassSelect" class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label> <select id="addClassSelect" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"> <option value="">-- Pilih Kelas --</option> </select>
-        </div>
-        <div class="md:col-span-2"><label for="addMajorSelect" class="block text-sm font-semibold text-gray-700 mb-2">Jurusan</label> <select id="addMajorSelect" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"> <option value="">-- Pilih Jurusan --</option> </select>
+        <div><label for="addClassName" class="block text-sm font-semibold text-gray-700 mb-2">Nama Kelas</label> <input type="text" id="addClassName" required placeholder="Contoh: XI - TKP-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
         </div>
         <div class="md:col-span-2"><button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg shadow-lg transition-all"> ➕ Tambah Siswa </button>
         </div>
@@ -248,10 +226,10 @@
       <div>
        <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-800 flex items-center space-x-2"><span>📋</span> <span>Daftar Siswa</span></h3>
-        <div class="flex gap-3"><select id="filterClass" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="renderStudentList()"> <option value="">Semua Kelas</option> </select> <select id="filterMajor" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="renderStudentList()"> <option value="">Semua Jurusan</option> </select>
+        <div class="flex gap-3"><select id="filterClass" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="renderStudentList()"> <option value="">Semua Kelas</option> </select>
         </div>
        </div>
-       <div class="flex gap-2 mb-4"><button onclick="deleteByMajor()" class="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all"> 🗑️ Hapus Per Jurusan </button> <button onclick="deleteByClass()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all"> 🗑️ Hapus Per Kelas </button> <button onclick="deleteAllStudents()" class="bg-red-800 hover:bg-red-900 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all"> 🗑️ Hapus Semua Siswa </button>
+       <div class="flex gap-2 mb-4"><button onclick="deleteByClass()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all"> 🗑️ Hapus Per Kelas </button> <button onclick="deleteAllStudents()" class="bg-red-800 hover:bg-red-900 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all"> 🗑️ Hapus Semua Siswa </button>
        </div>
        <div id="studentList" class="space-y-2"></div>
       </div>
@@ -266,19 +244,30 @@
        </div>
        <h2 class="text-2xl font-bold text-gray-800">Generate Laporan Bulanan</h2>
       </div>
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+       <h4 class="font-bold text-blue-900 mb-2">📋 Format Laporan Excel:</h4>
+       <ul class="text-sm text-blue-800 space-y-1">
+        <li>• <strong>Baris 1-8:</strong> Header sekolah (SMK NEGERI 4 JAKARTA, Tahun Pelajaran, Kelas, Bulan)</li>
+        <li>• <strong>Baris 9-10:</strong> Header tabel (NO, NIS, NAMA, L/P, Tanggal 1-31, S, I, A, % HADIR)</li>
+        <li>• <strong>Baris 11+:</strong> Data siswa dengan status kehadiran</li>
+        <li>• <strong>Status H (Hadir):</strong> Kolom tanggal dibiarkan KOSONG</li>
+        <li>• <strong>Status PKL:</strong> Dihitung sebagai HADIR, kolom tanggal dibiarkan KOSONG</li>
+        <li>• <strong>Status S/I/A:</strong> Ditulis hurufnya di kolom tanggal yang sesuai</li>
+        <li>• <strong>Rekapitulasi:</strong> Total S, I, A, dan % Kehadiran dihitung otomatis</li>
+       </ul>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-       <div><label for="reportClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="reportClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="reportClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
        </div>
-       <div><label for="reportMonth" class="block text-sm font-semibold text-gray-700 mb-2">Bulan &amp; Tahun</label> <input type="month" id="reportMonth" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Bulan &amp; Tahun</label> <input type="month" id="reportMonth" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
        </div>
       </div><button onclick="generateReport()" id="generateBtn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-4 rounded-lg shadow-lg transition-all"> 📥 Download Laporan Excel </button>
-      <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-       <p class="text-sm text-gray-700"><strong>📌 Format Laporan:</strong><br>
-         • Header sesuai template SMK NEGERI 4 JAKARTA<br>
-         • Kolom tanggal 1-31 dengan status (H=kosong, S/I/A=huruf)<br>
-         • Status PKL tercatat sebagai HADIR<br>
-         • Rekapitulasi otomatis: Total S, I, A, dan % Kehadiran<br>
-         • Siap cetak tanpa edit ulang</p>
+      <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+       <p class="text-sm text-gray-700"><strong>✅ Keunggulan Laporan:</strong><br>
+         • Format persis dengan template manual yang sudah digunakan<br>
+         • Siap cetak tanpa perlu edit ulang<br>
+         • Perhitungan otomatis untuk rekapitulasi<br>
+         • Kompatibel dengan Microsoft Excel dan Google Sheets</p>
       </div>
      </div>
     </div><!-- Tab: Rekapitulasi Per Siswa -->
@@ -292,14 +281,12 @@
        <h2 class="text-2xl font-bold text-gray-800">Rekapitulasi Per Siswa</h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-       <div><label for="recapClass" class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas</label> <select id="recapClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="">Semua Kelas</option> </select>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas</label> <select id="recapClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="">Semua Kelas</option> </select>
        </div>
-       <div><label for="recapMajor" class="block text-sm font-semibold text-gray-700 mb-2">Filter Jurusan</label> <select id="recapMajor" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="">Semua Jurusan</option> </select>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recapPeriod" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="all">Semua Data</option> <option value="month">Bulan Ini</option> <option value="last30">30 Hari Terakhir</option> <option value="semester">Semester Ini</option> </select>
        </div>
-       <div><label for="recapPeriod" class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recapPeriod" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="all">Semua Data</option> <option value="month">Bulan Ini</option> <option value="last30">30 Hari Terakhir</option> <option value="semester">Semester Ini</option> </select>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Cari Siswa</label> <input type="text" id="recapSearch" placeholder="Ketik nama atau NIS..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" oninput="renderRecapList()">
        </div>
-      </div><!-- Search Box -->
-      <div class="mb-6"><label for="recapSearch" class="block text-sm font-semibold text-gray-700 mb-2">🔍 Cari Siswa</label> <input type="text" id="recapSearch" placeholder="Ketik nama atau NIS siswa..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" oninput="renderRecapList()">
       </div><!-- Summary Cards -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
        <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-4">
@@ -341,7 +328,7 @@
        <div class="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-xl p-4">
         <div class="flex items-center justify-between">
          <div>
-          <p class="text-xs font-semibold text-red-700">Total Alpa</p>
+          <p class="text-xs font-semibold text-red-700">Total Alpha</p>
           <p class="text-2xl font-bold text-red-800"><span id="totalAbsent">0</span></p>
          </div>
          <div class="bg-red-500 rounded-full p-3">
@@ -386,11 +373,9 @@
     
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Global variables
+    // Global State
     let studentsData = [];
     let attendanceData = [];
-    let majorsData = [];
-    let classesData = [];
     let currentTab = 'input';
     let pendingConfirmAction = null;
 
@@ -399,14 +384,10 @@
       showLoading(true);
       
       try {
-        await loadMajors();
-        await loadClasses();
         await loadStudents();
         await loadAttendance();
         
-        // Set default date
         document.getElementById('inputDate').valueAsDate = new Date();
-        
         const currentMonth = new Date().toISOString().slice(0, 7);
         document.getElementById('reportMonth').value = currentMonth;
         
@@ -420,54 +401,17 @@
       }
     }
 
-    // Load Majors from Supabase
-    async function loadMajors() {
-      const { data, error } = await supabase
-        .from('majors')
-        .select('*')
-        .order('major_code');
-      
-      if (error) throw error;
-      majorsData = data || [];
-    }
-
-    // Load Classes from Supabase
-    async function loadClasses() {
-      const { data, error } = await supabase
-        .from('classes')
-        .select('*, majors(major_code, major_name)')
-        .order('class_name');
-      
-      if (error) throw error;
-      classesData = data || [];
-    }
-
-    // Load Students from Supabase with related data
+    // Load Students from Supabase
     async function loadStudents() {
       const { data, error } = await supabase
         .from('students')
-        .select(`
-          *,
-          classes(id, class_name),
-          majors(id, major_code, major_name)
-        `)
+        .select('*')
         .eq('is_active', true)
+        .order('className')
         .order('name');
       
       if (error) throw error;
-      
-      // Transform data to match application format
-      studentsData = (data || []).map(s => ({
-        id: s.id,
-        student_id: s.student_id,
-        nis: s.nis,
-        name: s.name,
-        gender: s.gender,
-        class_id: s.class_id,
-        class_name: s.classes?.class_name || '',
-        major_id: s.major_id,
-        major: s.majors?.major_code || ''
-      }));
+      studentsData = data || [];
     }
 
     // Load Attendance from Supabase
@@ -478,25 +422,13 @@
         .order('attendance_date', { ascending: false });
       
       if (error) throw error;
-      
-      // Transform to match application format
-      attendanceData = (data || []).map(a => ({
-        id: a.id,
-        student_id: a.student_id,
-        date: a.attendance_date,
-        status: a.status,
-        notes: a.notes
-      }));
+      attendanceData = data || [];
     }
 
-    // Update UI after data changes
+    // Update UI
     function updateUI() {
       updateStats();
       populateClassDropdowns();
-      populateMajorDropdowns();
-      renderClassList();
-      renderMajorList();
-      populateRecapDropdowns();
       
       if (currentTab === 'input') {
         loadAttendanceForm();
@@ -507,19 +439,16 @@
       }
     }
 
-    // Update statistics
+    // Update Statistics
     function updateStats() {
       document.getElementById('totalStudents').textContent = studentsData.length;
-      
-      const uniqueClasses = [...new Set(studentsData.map(s => s.class_name))];
+      const uniqueClasses = [...new Set(studentsData.map(s => s.className))];
       document.getElementById('totalClasses').textContent = uniqueClasses.length;
     }
 
-    // Populate class dropdowns
+    // Populate Class Dropdowns
     function populateClassDropdowns() {
-      const uniqueClasses = classesData.map(c => c.class_name).sort();
-      
-      const dropdowns = ['inputClass', 'reportClass', 'filterClass', 'importClass', 'addClassSelect', 'recapClass'];
+      const dropdowns = ['inputClass', 'reportClass', 'filterClass', 'recapClass'];
       dropdowns.forEach(id => {
         const select = document.getElementById(id);
         const currentValue = select.value;
@@ -530,12 +459,13 @@
           select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
         }
         
+        const uniqueClasses = [...new Set(studentsData.map(s => s.className))].sort();
         uniqueClasses.forEach(className => {
+          const studentsInClass = studentsData.filter(s => s.className === className);
           const option = document.createElement('option');
           option.value = className;
           
-          if (['inputClass', 'reportClass'].includes(id)) {
-            const studentsInClass = studentsData.filter(s => s.class_name === className);
+          if (id === 'inputClass' || id === 'reportClass') {
             option.textContent = `${className} (${studentsInClass.length} siswa)`;
           } else {
             option.textContent = className;
@@ -548,243 +478,7 @@
       });
     }
 
-    // Populate major dropdowns
-    function populateMajorDropdowns() {
-      const dropdowns = ['importMajor', 'filterMajor', 'addMajorSelect', 'recapMajor'];
-      dropdowns.forEach(id => {
-        const select = document.getElementById(id);
-        const currentValue = select.value;
-        
-        if (['filterMajor', 'recapMajor'].includes(id)) {
-          select.innerHTML = '<option value="">Semua Jurusan</option>';
-        } else {
-          select.innerHTML = '<option value="">-- Pilih Jurusan --</option>';
-        }
-        
-        majorsData.forEach(major => {
-          const option = document.createElement('option');
-          option.value = major.id;
-          option.textContent = `${major.major_code} - ${major.major_name}`;
-          option.setAttribute('data-code', major.major_code);
-          select.appendChild(option);
-        });
-        
-        select.value = currentValue;
-      });
-    }
-
-    // Add major to Supabase
-    async function addMajor() {
-      const codeInput = document.getElementById('newMajorCode');
-      const nameInput = document.getElementById('newMajorName');
-      const majorCode = codeInput.value.trim().toUpperCase();
-      const majorName = nameInput.value.trim();
-      
-      if (!majorCode || !majorName) {
-        showToast('Masukkan kode dan nama jurusan', 'error');
-        return;
-      }
-      
-      showLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('majors')
-          .insert([
-            { major_code: majorCode, major_name: majorName }
-          ])
-          .select();
-        
-        if (error) throw error;
-        
-        await loadMajors();
-        updateUI();
-        
-        codeInput.value = '';
-        nameInput.value = '';
-        showToast('✅ Jurusan berhasil ditambahkan!', 'success');
-      } catch (error) {
-        console.error('Error adding major:', error);
-        showToast('❌ Gagal menambah jurusan: ' + error.message, 'error');
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // Add class to Supabase
-    async function addClass() {
-      const nameInput = document.getElementById('newClassName');
-      const className = nameInput.value.trim();
-      
-      if (!className) {
-        showToast('Masukkan nama kelas', 'error');
-        return;
-      }
-      
-      showLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('classes')
-          .insert([
-            { class_name: className }
-          ])
-          .select();
-        
-        if (error) throw error;
-        
-        await loadClasses();
-        updateUI();
-        
-        nameInput.value = '';
-        showToast('✅ Kelas berhasil ditambahkan!', 'success');
-      } catch (error) {
-        console.error('Error adding class:', error);
-        showToast('❌ Gagal menambah kelas: ' + error.message, 'error');
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // Render class list
-    function renderClassList() {
-      const container = document.getElementById('classList');
-      
-      if (classesData.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada kelas. Tambahkan kelas untuk mengorganisir data siswa.</p>';
-        return;
-      }
-      
-      container.innerHTML = '';
-      classesData.forEach(classItem => {
-        const studentsInClass = studentsData.filter(s => s.class_id === classItem.id);
-        
-        const badge = document.createElement('div');
-        badge.className = 'bg-indigo-100 border border-indigo-300 text-indigo-800 px-4 py-2 rounded-lg flex items-center gap-2';
-        badge.innerHTML = `
-          <span class="font-semibold">${classItem.class_name}</span>
-          <span class="bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded text-xs font-bold">${studentsInClass.length} siswa</span>
-          <button onclick="deleteClass('${classItem.id}')" class="text-indigo-600 hover:text-indigo-800 font-bold">
-            ✕
-          </button>
-        `;
-        container.appendChild(badge);
-      });
-    }
-
-    // Delete class
-    async function deleteClass(classId) {
-      const studentsInClass = studentsData.filter(s => s.class_id === classId);
-      
-      if (studentsInClass.length > 0) {
-        showToast(`Tidak bisa hapus! Ada ${studentsInClass.length} siswa di kelas ini`, 'error');
-        return;
-      }
-      
-      showLoading(true);
-      
-      try {
-        const { error } = await supabase
-          .from('classes')
-          .delete()
-          .eq('id', classId);
-        
-        if (error) throw error;
-        
-        await loadClasses();
-        updateUI();
-        
-        showToast('✅ Kelas berhasil dihapus!', 'success');
-      } catch (error) {
-        console.error('Error deleting class:', error);
-        showToast('❌ Gagal menghapus kelas: ' + error.message, 'error');
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // Render major list
-    function renderMajorList() {
-      const container = document.getElementById('majorList');
-      
-      if (majorsData.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada jurusan. Tambahkan jurusan untuk mengorganisir data siswa.</p>';
-        return;
-      }
-      
-      container.innerHTML = '';
-      majorsData.forEach(major => {
-        const badge = document.createElement('div');
-        badge.className = 'bg-cyan-100 border border-cyan-300 text-cyan-800 px-4 py-2 rounded-lg flex items-center gap-2';
-        badge.innerHTML = `
-          <span class="font-semibold">${major.major_code} - ${major.major_name}</span>
-          <button onclick="deleteMajor('${major.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold">
-            ✕
-          </button>
-        `;
-        container.appendChild(badge);
-      });
-    }
-
-    // Delete major
-    async function deleteMajor(majorId) {
-      const studentsInMajor = studentsData.filter(s => s.major_id === majorId);
-      
-      if (studentsInMajor.length > 0) {
-        showToast(`Tidak bisa hapus! Ada ${studentsInMajor.length} siswa di jurusan ini`, 'error');
-        return;
-      }
-      
-      showLoading(true);
-      
-      try {
-        const { error } = await supabase
-          .from('majors')
-          .delete()
-          .eq('id', majorId);
-        
-        if (error) throw error;
-        
-        await loadMajors();
-        updateUI();
-        
-        showToast('✅ Jurusan berhasil dihapus!', 'success');
-      } catch (error) {
-        console.error('Error deleting major:', error);
-        showToast('❌ Gagal menghapus jurusan: ' + error.message, 'error');
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // Populate recap dropdowns
-    function populateRecapDropdowns() {
-      const uniqueClasses = [...new Set(studentsData.map(s => s.class_name))].sort();
-      
-      const classSelect = document.getElementById('recapClass');
-      const currentClass = classSelect.value;
-      classSelect.innerHTML = '<option value="">Semua Kelas</option>';
-      uniqueClasses.forEach(className => {
-        const option = document.createElement('option');
-        option.value = className;
-        option.textContent = className;
-        classSelect.appendChild(option);
-      });
-      classSelect.value = currentClass;
-      
-      const majorSelect = document.getElementById('recapMajor');
-      const currentMajor = majorSelect.value;
-      majorSelect.innerHTML = '<option value="">Semua Jurusan</option>';
-      majorsData.forEach(major => {
-        const option = document.createElement('option');
-        option.value = major.major_code;
-        option.textContent = `${major.major_code} - ${major.major_name}`;
-        majorSelect.appendChild(option);
-      });
-      majorSelect.value = currentMajor;
-    }
-
-    // Switch tabs
+    // Switch Tabs
     function switchTab(tab) {
       currentTab = tab;
       
@@ -814,7 +508,7 @@
       }
     }
 
-    // Load attendance form
+    // Load Attendance Form
     function loadAttendanceForm() {
       const className = document.getElementById('inputClass').value;
       const date = document.getElementById('inputDate').value;
@@ -827,7 +521,8 @@
         return;
       }
       
-      const classStudents = studentsData.filter(s => s.class_name === className).sort((a, b) => a.name.localeCompare(b.name));
+      const classStudents = studentsData.filter(s => s.className === className)
+        .sort((a, b) => a.name.localeCompare(b.name));
       
       if (classStudents.length === 0) {
         container.innerHTML = '<p class="text-gray-500 text-center py-8">Tidak ada siswa di kelas ini</p>';
@@ -840,7 +535,7 @@
       
       classStudents.forEach((student, index) => {
         const existingAttendance = attendanceData.find(
-          a => a.student_id === student.id && a.date === date
+          a => a.student_id === student.id && a.attendance_date === date
         );
         const currentStatus = existingAttendance ? existingAttendance.status : 'H';
         
@@ -852,20 +547,20 @@
             <p class="text-sm text-gray-600">NIS: ${student.nis} | ${student.gender === 'L' ? '👨 Laki-laki' : '👩 Perempuan'}</p>
           </div>
           <div class="flex gap-2">
-            <button onclick="setStatus('${student.id}', 'H')" class="status-btn status-H text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'H' ? 'ring-4 ring-green-300' : 'opacity-60'}">
+            <button onclick="setStatus('${student.id}', 'H')" data-student="${student.id}" data-status="H" class="status-btn status-H text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'H' ? 'ring-4 ring-green-300' : 'opacity-60'}">
               H
             </button>
-            <button onclick="setStatus('${student.id}', 'S')" class="status-btn status-S text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'S' ? 'ring-4 ring-yellow-300' : 'opacity-60'}">
+            <button onclick="setStatus('${student.id}', 'PKL')" data-student="${student.id}" data-status="PKL" class="status-btn bg-purple-500 text-white px-3 py-2 rounded-lg font-semibold ${currentStatus === 'PKL' ? 'ring-4 ring-purple-300' : 'opacity-60'}">
+              PKL
+            </button>
+            <button onclick="setStatus('${student.id}', 'S')" data-student="${student.id}" data-status="S" class="status-btn status-S text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'S' ? 'ring-4 ring-yellow-300' : 'opacity-60'}">
               S
             </button>
-            <button onclick="setStatus('${student.id}', 'I')" class="status-btn status-I text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'I' ? 'ring-4 ring-blue-300' : 'opacity-60'}">
+            <button onclick="setStatus('${student.id}', 'I')" data-student="${student.id}" data-status="I" class="status-btn status-I text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'I' ? 'ring-4 ring-blue-300' : 'opacity-60'}">
               I
             </button>
-            <button onclick="setStatus('${student.id}', 'A')" class="status-btn status-A text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'A' ? 'ring-4 ring-red-300' : 'opacity-60'}">
+            <button onclick="setStatus('${student.id}', 'A')" data-student="${student.id}" data-status="A" class="status-btn status-A text-white px-4 py-2 rounded-lg font-semibold ${currentStatus === 'A' ? 'ring-4 ring-red-300' : 'opacity-60'}">
               A
-            </button>
-            <button onclick="setStatus('${student.id}', 'PKL')" class="status-btn status-PKL text-white px-3 py-2 rounded-lg font-semibold text-sm ${currentStatus === 'PKL' ? 'ring-4 ring-purple-300' : 'opacity-60'}">
-              PKL
             </button>
           </div>
         `;
@@ -873,26 +568,26 @@
       });
     }
 
-    // Set attendance status (visual only)
+    // Set Attendance Status
     function setStatus(studentId, status) {
-      const buttons = document.querySelectorAll(`button[onclick*="${studentId}"]`);
+      const buttons = document.querySelectorAll(`button[data-student="${studentId}"]`);
       buttons.forEach(btn => {
-        btn.classList.remove('ring-4', 'ring-green-300', 'ring-yellow-300', 'ring-blue-300', 'ring-red-300', 'ring-purple-300');
+        btn.classList.remove('ring-4', 'ring-green-300', 'ring-purple-300', 'ring-yellow-300', 'ring-blue-300', 'ring-red-300');
         btn.classList.add('opacity-60');
       });
       
-      const selectedBtn = Array.from(buttons).find(btn => btn.textContent.trim() === status);
+      const selectedBtn = Array.from(buttons).find(btn => btn.getAttribute('data-status') === status);
       if (selectedBtn) {
         selectedBtn.classList.remove('opacity-60');
         const ringColor = status === 'H' ? 'ring-green-300' : 
+                         status === 'PKL' ? 'ring-purple-300' :
                          status === 'S' ? 'ring-yellow-300' : 
-                         status === 'I' ? 'ring-blue-300' : 
-                         status === 'A' ? 'ring-red-300' : 'ring-purple-300';
+                         status === 'I' ? 'ring-blue-300' : 'ring-red-300';
         selectedBtn.classList.add('ring-4', ringColor);
       }
     }
 
-    // Save attendance to Supabase
+    // Save Attendance
     async function saveAttendance() {
       const className = document.getElementById('inputClass').value;
       const date = document.getElementById('inputDate').value;
@@ -908,15 +603,15 @@
       saveBtn.textContent = '⏳ Menyimpan...';
       
       try {
-        const classStudents = studentsData.filter(s => s.class_name === className);
+        const classStudents = studentsData.filter(s => s.className === className);
         const attendanceRecords = [];
         
         classStudents.forEach(student => {
-          const buttons = document.querySelectorAll(`button[onclick*="${student.id}"]`);
+          const buttons = document.querySelectorAll(`button[data-student="${student.id}"]`);
           let selectedStatus = 'H';
           buttons.forEach(btn => {
             if (btn.classList.contains('ring-4')) {
-              selectedStatus = btn.textContent.trim();
+              selectedStatus = btn.getAttribute('data-status');
             }
           });
           
@@ -927,7 +622,6 @@
           });
         });
         
-        // Upsert attendance records
         const { error } = await supabase
           .from('attendance')
           .upsert(attendanceRecords, {
@@ -948,21 +642,97 @@
       }
     }
 
+    // Download Template
+    function downloadTemplate() {
+      showLoading(true);
+      
+      setTimeout(() => {
+        const wb = XLSX.utils.book_new();
+        const data = [];
+        
+        // Header (Baris 1-8)
+        data.push(['SMK NEGERI 4 JAKARTA']);
+        data.push(['DAFTAR HADIR SISWA']);
+        data.push(['TAHUN PELAJARAN 2025/2026']);
+        data.push(['KELAS: [ISI NAMA KELAS, Contoh: XI - TKP-1]']);
+        data.push(['BULAN: [ISI BULAN & TAHUN]']);
+        data.push([]);
+        data.push([]);
+        data.push([]);
+        
+        // Header Tabel (Baris 9-10)
+        const headerRow1 = ['NO', 'NIS', 'NAMA', 'L/P'];
+        const headerRow2 = ['', '', '', ''];
+        
+        for (let i = 1; i <= 31; i++) {
+          headerRow1.push(i);
+          headerRow2.push('');
+        }
+        
+        headerRow1.push('S', 'I', 'A', '% HADIR');
+        headerRow2.push('', '', '', '');
+        
+        data.push(headerRow1);
+        data.push(headerRow2);
+        
+        // Data Contoh (Baris 11+)
+        const sampleData = [
+          [1, '2024001', 'CONTOH NAMA SISWA 1', 'L'],
+          [2, '2024002', 'CONTOH NAMA SISWA 2', 'P'],
+          [3, '2024003', 'CONTOH NAMA SISWA 3', 'L'],
+          [4, '2024004', 'CONTOH NAMA SISWA 4', 'P'],
+          [5, '2024005', 'CONTOH NAMA SISWA 5', 'L']
+        ];
+        
+        sampleData.forEach(sample => {
+          const row = [...sample];
+          for (let i = 0; i < 31; i++) {
+            row.push('');
+          }
+          row.push('', '', '', '');
+          data.push(row);
+        });
+        
+        data.push([]);
+        data.push(['PETUNJUK PENGISIAN:']);
+        data.push(['1. Hapus baris contoh (baris 11-15) dan ganti dengan data siswa sebenarnya']);
+        data.push(['2. Isi kolom NO, NIS, NAMA, dan L/P untuk setiap siswa']);
+        data.push(['3. Kolom tanggal 1-31, S, I, A, dan % HADIR biarkan kosong (akan diisi otomatis oleh sistem)']);
+        data.push(['4. Simpan file dan upload ke sistem untuk import data siswa']);
+        
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        
+        const cols = [
+          { wch: 5 },
+          { wch: 12 },
+          { wch: 30 },
+          { wch: 5 },
+        ];
+        
+        for (let i = 0; i < 31; i++) {
+          cols.push({ wch: 3 });
+        }
+        
+        cols.push({ wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 10 });
+        
+        ws['!cols'] = cols;
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Template Data Siswa');
+        XLSX.writeFile(wb, 'Template_Data_Siswa_SMK_Negeri_4_Jakarta.xlsx');
+        
+        showLoading(false);
+        showToast('✅ Template berhasil didownload!', 'success');
+      }, 500);
+    }
+
     // Import Excel
     async function importExcel() {
       const fileInput = document.getElementById('excelFile');
       const file = fileInput.files[0];
-      const selectedClassSelect = document.getElementById('importClass');
-      const selectedClassName = selectedClassSelect.value.trim();
-      const selectedMajorId = document.getElementById('importMajor').value;
+      const className = document.getElementById('importClassName').value.trim();
       
-      if (!selectedClassName) {
-        showToast('❌ Pilih kelas terlebih dahulu!', 'error');
-        return;
-      }
-      
-      if (!selectedMajorId) {
-        showToast('❌ Pilih jurusan terlebih dahulu!', 'error');
+      if (!className) {
+        showToast('❌ Masukkan nama kelas terlebih dahulu!', 'error');
         return;
       }
       
@@ -981,15 +751,9 @@
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
           
-          // Get class_id
-          const selectedClass = classesData.find(c => c.class_name === selectedClassName);
-          if (!selectedClass) {
-            throw new Error('Kelas tidak ditemukan');
-          }
-          
           const studentsToImport = [];
           
-          // Start from row 11 (index 10)
+          // Mulai dari baris 11 (index 10)
           for (let i = 10; i < jsonData.length; i++) {
             const row = jsonData[i];
             if (!row[1] || !row[2]) continue;
@@ -998,17 +762,14 @@
             const name = String(row[2]).trim();
             const gender = String(row[3]).trim().toUpperCase();
             
-            // Check if student already exists
             const exists = studentsData.find(s => s.nis === nis);
             if (exists) continue;
             
             studentsToImport.push({
-              student_id: `STD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
               nis: nis,
               name: name,
               gender: gender === 'L' || gender === 'P' ? gender : 'L',
-              class_id: selectedClass.id,
-              major_id: selectedMajorId,
+              className: className,
               is_active: true
             });
           }
@@ -1019,10 +780,9 @@
             return;
           }
           
-          const { data: insertedData, error } = await supabase
+          const { error } = await supabase
             .from('students')
-            .insert(studentsToImport)
-            .select();
+            .insert(studentsToImport);
           
           if (error) throw error;
           
@@ -1031,8 +791,7 @@
           
           showToast(`✅ Berhasil import ${studentsToImport.length} siswa!`, 'success');
           fileInput.value = '';
-          document.getElementById('importClass').value = '';
-          document.getElementById('importMajor').value = '';
+          document.getElementById('importClassName').value = '';
           
         } catch (error) {
           console.error('Error importing Excel:', error);
@@ -1045,43 +804,33 @@
       reader.readAsArrayBuffer(file);
     }
 
-    // Add student manually
+    // Add Student Manually
     document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
       const nis = document.getElementById('addNis').value.trim();
       const name = document.getElementById('addName').value.trim();
       const gender = document.getElementById('addGender').value;
-      const classId = document.getElementById('addClassSelect').value;
-      const majorId = document.getElementById('addMajorSelect').value;
+      const className = document.getElementById('addClassName').value.trim();
       
-      // Check duplicate NIS
       const exists = studentsData.find(s => s.nis === nis);
       if (exists) {
         showToast('NIS sudah terdaftar!', 'error');
         return;
       }
       
-      if (!classId || !majorId) {
-        showToast('Pilih kelas dan jurusan terlebih dahulu!', 'error');
-        return;
-      }
-      
       showLoading(true);
       
       try {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('students')
           .insert([{
-            student_id: `STD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             nis: nis,
             name: name,
             gender: gender,
-            class_id: classId,
-            major_id: majorId,
+            className: className,
             is_active: true
-          }])
-          .select();
+          }]);
         
         if (error) throw error;
         
@@ -1098,21 +847,14 @@
       }
     });
 
-    // Render student list
+    // Render Student List
     function renderStudentList() {
       const filterClass = document.getElementById('filterClass').value;
-      const filterMajorCode = document.getElementById('filterMajor').value;
       const container = document.getElementById('studentList');
       
       let filteredStudents = studentsData;
       if (filterClass) {
-        filteredStudents = filteredStudents.filter(s => s.class_name === filterClass);
-      }
-      if (filterMajorCode) {
-        const selectedMajor = majorsData.find(m => m.id === filterMajorCode);
-        if (selectedMajor) {
-          filteredStudents = filteredStudents.filter(s => s.major === selectedMajor.major_code);
-        }
+        filteredStudents = filteredStudents.filter(s => s.className === filterClass);
       }
       
       filteredStudents.sort((a, b) => a.name.localeCompare(b.name));
@@ -1124,16 +866,13 @@
       
       container.innerHTML = '';
       filteredStudents.forEach((student, index) => {
-        const majorBadge = student.major ? `<span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs font-semibold">${student.major}</span>` : '';
-        
         const card = document.createElement('div');
         card.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100';
         card.innerHTML = `
           <div class="flex-1">
             <p class="font-semibold text-gray-800">${index + 1}. ${student.name}</p>
             <div class="flex items-center gap-2 mt-1">
-              <p class="text-sm text-gray-600">NIS: ${student.nis} | ${student.gender === 'L' ? '👨 Laki-laki' : '👩 Perempuan'} | Kelas: ${student.class_name}</p>
-              ${majorBadge}
+              <p class="text-sm text-gray-600">NIS: ${student.nis} | ${student.gender === 'L' ? '👨 Laki-laki' : '👩 Perempuan'} | Kelas: ${student.className}</p>
             </div>
           </div>
           <button onclick="deleteStudent('${student.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-all">
@@ -1144,7 +883,7 @@
       });
     }
 
-    // Show confirmation modal
+    // Show Confirmation Modal
     function showConfirmation(title, message, onConfirm) {
       document.getElementById('confirmationTitle').textContent = title;
       document.getElementById('confirmationMessage').textContent = message;
@@ -1158,7 +897,7 @@
       document.getElementById('confirmButton').onclick = executeConfirmation;
     }
 
-    // Execute confirmation
+    // Execute Confirmation
     function executeConfirmation() {
       if (pendingConfirmAction) {
         pendingConfirmAction();
@@ -1167,7 +906,7 @@
       cancelConfirmation();
     }
 
-    // Cancel confirmation
+    // Cancel Confirmation
     function cancelConfirmation() {
       const modal = document.getElementById('confirmationModal');
       modal.classList.add('hidden');
@@ -1175,7 +914,7 @@
       pendingConfirmAction = null;
     }
 
-    // Delete student
+    // Delete Student
     async function deleteStudent(studentId) {
       const student = studentsData.find(s => s.id === studentId);
       if (!student) return;
@@ -1209,55 +948,7 @@
       );
     }
 
-    // Delete by major
-    async function deleteByMajor() {
-      const filterMajorId = document.getElementById('filterMajor').value;
-      
-      if (!filterMajorId) {
-        showToast('Pilih jurusan terlebih dahulu dari filter dropdown', 'error');
-        return;
-      }
-      
-      const selectedMajor = majorsData.find(m => m.id === filterMajorId);
-      const studentsToDelete = studentsData.filter(s => s.major_id === filterMajorId);
-      
-      if (studentsToDelete.length === 0) {
-        showToast('Tidak ada siswa di jurusan ini', 'error');
-        return;
-      }
-      
-      showConfirmation(
-        'Hapus Per Jurusan',
-        `Yakin hapus ${studentsToDelete.length} siswa dari jurusan ${selectedMajor.major_code}? Data presensi juga akan terhapus.`,
-        async () => {
-          showLoading(true);
-          
-          try {
-            const studentIds = studentsToDelete.map(s => s.id);
-            
-            const { error } = await supabase
-              .from('students')
-              .delete()
-              .in('id', studentIds);
-            
-            if (error) throw error;
-            
-            await loadStudents();
-            await loadAttendance();
-            updateUI();
-            
-            showToast(`✅ Berhasil hapus ${studentsToDelete.length} siswa!`, 'success');
-          } catch (error) {
-            console.error('Error deleting students:', error);
-            showToast('❌ Gagal menghapus siswa: ' + error.message, 'error');
-          } finally {
-            showLoading(false);
-          }
-        }
-      );
-    }
-
-    // Delete by class
+    // Delete by Class
     async function deleteByClass() {
       const filterClass = document.getElementById('filterClass').value;
       
@@ -1266,7 +957,7 @@
         return;
       }
       
-      const studentsToDelete = studentsData.filter(s => s.class_name === filterClass);
+      const studentsToDelete = studentsData.filter(s => s.className === filterClass);
       
       if (studentsToDelete.length === 0) {
         showToast('Tidak ada siswa di kelas ini', 'error');
@@ -1304,7 +995,7 @@
       );
     }
 
-    // Delete all students
+    // Delete All Students
     async function deleteAllStudents() {
       if (studentsData.length === 0) {
         showToast('Tidak ada siswa untuk dihapus', 'error');
@@ -1343,86 +1034,7 @@
       );
     }
 
-    // Download Template
-    function downloadTemplate() {
-      showLoading(true);
-      
-      setTimeout(() => {
-        const wb = XLSX.utils.book_new();
-        const data = [];
-        
-        data.push(['SMK NEGERI 4 JAKARTA']);
-        data.push(['DAFTAR HADIR SISWA']);
-        data.push(['TAHUN PELAJARAN 2025/2026']);
-        data.push(['KELAS: [ISI NAMA KELAS]']);
-        data.push(['BULAN: [ISI BULAN & TAHUN]']);
-        data.push([]);
-        data.push([]);
-        data.push([]);
-        
-        const headerRow1 = ['NO', 'NIS', 'NAMA', 'L/P'];
-        const headerRow2 = ['', '', '', ''];
-        
-        for (let i = 1; i <= 31; i++) {
-          headerRow1.push(i);
-          headerRow2.push('');
-        }
-        
-        headerRow1.push('S', 'I', 'A', '% HADIR');
-        headerRow2.push('', '', '', '');
-        
-        data.push(headerRow1);
-        data.push(headerRow2);
-        
-        const sampleData = [
-          [1, '2024001', 'CONTOH NAMA SISWA 1', 'L'],
-          [2, '2024002', 'CONTOH NAMA SISWA 2', 'P'],
-          [3, '2024003', 'CONTOH NAMA SISWA 3', 'L'],
-          [4, '2024004', 'CONTOH NAMA SISWA 4', 'P'],
-          [5, '2024005', 'CONTOH NAMA SISWA 5', 'L']
-        ];
-        
-        sampleData.forEach(sample => {
-          const row = [...sample];
-          for (let i = 0; i < 31; i++) {
-            row.push('');
-          }
-          row.push('', '', '', '');
-          data.push(row);
-        });
-        
-        data.push([]);
-        data.push(['PETUNJUK PENGISIAN:']);
-        data.push(['1. Hapus baris contoh (baris 11-15) dan ganti dengan data siswa sebenarnya']);
-        data.push(['2. Isi kolom NO, NIS, NAMA, dan L/P untuk setiap siswa']);
-        data.push(['3. Simpan file dan upload ke sistem untuk import data']);
-        
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        
-        const cols = [
-          { wch: 5 },
-          { wch: 12 },
-          { wch: 30 },
-          { wch: 5 },
-        ];
-        
-        for (let i = 0; i < 31; i++) {
-          cols.push({ wch: 3 });
-        }
-        
-        cols.push({ wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 10 });
-        
-        ws['!cols'] = cols;
-        
-        XLSX.utils.book_append_sheet(wb, ws, 'Template Data Siswa');
-        XLSX.writeFile(wb, 'Template_Data_Siswa_SMK.xlsx');
-        
-        showLoading(false);
-        showToast('✅ Template berhasil didownload!', 'success');
-      }, 500);
-    }
-
-    // Generate Excel Report
+    // Generate Report
     async function generateReport() {
       const className = document.getElementById('reportClass').value;
       const monthYear = document.getElementById('reportMonth').value;
@@ -1440,12 +1052,15 @@
                             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const monthName = monthNames[parseInt(month) - 1];
         
-        const classStudents = studentsData.filter(s => s.class_name === className).sort((a, b) => a.name.localeCompare(b.name));
+        const classStudents = studentsData.filter(s => s.className === className)
+          .sort((a, b) => a.name.localeCompare(b.name));
+        
         const daysInMonth = new Date(year, month, 0).getDate();
         
         const wb = XLSX.utils.book_new();
         const data = [];
         
+        // Header (Baris 1-8) - Persis seperti template
         data.push(['SMK NEGERI 4 JAKARTA']);
         data.push(['DAFTAR HADIR SISWA']);
         data.push([`TAHUN PELAJARAN 2025/2026`]);
@@ -1455,6 +1070,7 @@
         data.push([]);
         data.push([]);
         
+        // Header Tabel (Baris 9-10)
         const headerRow1 = ['NO', 'NIS', 'NAMA', 'L/P'];
         const headerRow2 = ['', '', '', ''];
         
@@ -1469,6 +1085,7 @@
         data.push(headerRow1);
         data.push(headerRow2);
         
+        // Data Siswa (Baris 11+)
         classStudents.forEach((student, index) => {
           const row = [
             index + 1,
@@ -1479,26 +1096,29 @@
           
           let totalS = 0, totalI = 0, totalA = 0;
           
+          // Isi kolom tanggal 1-31
           for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${month.padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const attendance = attendanceData.find(a => a.student_id === student.id && a.date === dateStr);
+            const attendance = attendanceData.find(a => a.student_id === student.id && a.attendance_date === dateStr);
             
             if (attendance) {
               if (attendance.status === 'H' || attendance.status === 'PKL') {
-                row.push('');
+                row.push(''); // Hadir dan PKL = kosong (dihitung hadir)
               } else {
-                row.push(attendance.status);
+                row.push(attendance.status); // S, I, atau A
                 if (attendance.status === 'S') totalS++;
                 if (attendance.status === 'I') totalI++;
                 if (attendance.status === 'A') totalA++;
               }
             } else {
-              row.push('');
+              row.push(''); // Tidak ada data = kosong (dianggap hadir)
             }
           }
           
+          // Kolom rekapitulasi
           row.push(totalS, totalI, totalA);
           
+          // Perhitungan % Hadir
           const totalPresent = daysInMonth - (totalS + totalI + totalA);
           const percentage = ((totalPresent / daysInMonth) * 100).toFixed(1);
           row.push(`${percentage}%`);
@@ -1506,16 +1126,18 @@
           data.push(row);
         });
         
+        // Keterangan
         data.push([]);
         data.push(['KETERANGAN:']);
-        data.push(['H = Hadir (kolom kosong)']);
+        data.push(['H = Hadir (kolom tanggal kosong)']);
+        data.push(['PKL = Praktek Kerja Lapangan (dihitung Hadir, kolom tanggal kosong)']);
         data.push(['S = Sakit']);
         data.push(['I = Izin']);
-        data.push(['A = Alpa (tanpa keterangan)']);
-        data.push(['PKL = Praktik Kerja Lapangan (tercatat HADIR)']);
+        data.push(['A = Alpha (tanpa keterangan)']);
         
         const ws = XLSX.utils.aoa_to_sheet(data);
         
+        // Set column widths
         ws['!cols'] = [
           { wch: 5 },
           { wch: 12 },
@@ -1529,7 +1151,8 @@
         
         ws['!cols'].push({ wch: 5 }, { wch: 5 }, { wch: 5 }, { wch: 10 });
         
-        XLSX.utils.book_append_sheet(wb, ws, className);
+        const sheetName = className.substring(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
         XLSX.writeFile(wb, `Presensi_${className}_${monthName}_${year}.xlsx`);
         
         showLoading(false);
@@ -1537,10 +1160,9 @@
       }, 500);
     }
 
-    // Render recap list
+    // Render Recap List
     function renderRecapList() {
       const filterClass = document.getElementById('recapClass').value;
-      const filterMajor = document.getElementById('recapMajor').value;
       const period = document.getElementById('recapPeriod').value;
       const searchQuery = document.getElementById('recapSearch').value.toLowerCase().trim();
       const container = document.getElementById('recapList');
@@ -1548,10 +1170,7 @@
       let filteredStudents = studentsData;
       
       if (filterClass) {
-        filteredStudents = filteredStudents.filter(s => s.class_name === filterClass);
-      }
-      if (filterMajor) {
-        filteredStudents = filteredStudents.filter(s => s.major === filterMajor);
+        filteredStudents = filteredStudents.filter(s => s.className === filterClass);
       }
       if (searchQuery) {
         filteredStudents = filteredStudents.filter(s => 
@@ -1562,7 +1181,7 @@
       
       filteredStudents.sort((a, b) => a.name.localeCompare(b.name));
       
-      let totalHadir = 0, totalSick = 0, totalPermit = 0, totalAbsent = 0, totalPKL = 0;
+      let totalHadir = 0, totalSick = 0, totalPermit = 0, totalAbsent = 0;
       let totalDays = 0;
       
       const studentStats = filteredStudents.map(student => {
@@ -1586,14 +1205,14 @@
             }
           }
           
-          studentAttendance = studentAttendance.filter(a => new Date(a.date) >= startDate);
+          studentAttendance = studentAttendance.filter(a => new Date(a.attendance_date) >= startDate);
         }
         
         const countH = studentAttendance.filter(a => a.status === 'H').length;
+        const countPKL = studentAttendance.filter(a => a.status === 'PKL').length;
         const countS = studentAttendance.filter(a => a.status === 'S').length;
         const countI = studentAttendance.filter(a => a.status === 'I').length;
         const countA = studentAttendance.filter(a => a.status === 'A').length;
-        const countPKL = studentAttendance.filter(a => a.status === 'PKL').length;
         
         const totalRecords = studentAttendance.length;
         const presentDays = countH + countPKL;
@@ -1603,23 +1222,22 @@
         totalSick += countS;
         totalPermit += countI;
         totalAbsent += countA;
-        totalPKL += countPKL;
         totalDays += totalRecords;
         
         return {
           student,
           countH,
+          countPKL,
           countS,
           countI,
           countA,
-          countPKL,
           totalRecords,
           presentDays,
           percentage
         };
       });
       
-      const avgAttendance = totalDays > 0 ? (((totalHadir + totalPKL) / totalDays) * 100).toFixed(1) : 0;
+      const avgAttendance = totalDays > 0 ? ((totalHadir / totalDays) * 100).toFixed(1) : 0;
       document.getElementById('avgAttendance').textContent = avgAttendance;
       document.getElementById('totalSick').textContent = totalSick;
       document.getElementById('totalPermit').textContent = totalPermit;
@@ -1664,8 +1282,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-2 mt-2">
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">${student.class_name}</span>
-                ${student.major ? `<span class="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-xs font-semibold">${student.major}</span>` : ''}
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">${student.className}</span>
               </div>
             </div>
             <div class="text-right">
@@ -1687,7 +1304,7 @@
               <p class="text-2xl font-bold text-green-800">${stat.countH}</p>
             </div>
             <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-3 text-center">
-              <p class="text-xs text-purple-700 mb-1">💼 PKL</p>
+              <p class="text-xs text-purple-700 mb-1">🏭 PKL</p>
               <p class="text-2xl font-bold text-purple-800">${stat.countPKL}</p>
             </div>
             <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 text-center">
@@ -1699,7 +1316,7 @@
               <p class="text-2xl font-bold text-blue-800">${stat.countI}</p>
             </div>
             <div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 text-center">
-              <p class="text-xs text-red-700 mb-1">❌ Alpa</p>
+              <p class="text-xs text-red-700 mb-1">❌ Alpha</p>
               <p class="text-2xl font-bold text-red-800">${stat.countA}</p>
             </div>
           </div>
@@ -1707,15 +1324,7 @@
           ${stat.countA > 0 ? `
           <div class="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded">
             <p class="text-sm text-red-800">
-              <strong>⚠️ Perhatian:</strong> Siswa ini memiliki ${stat.countA} hari alpa. Perlu tindak lanjut dari wali kelas.
-            </p>
-          </div>
-          ` : ''}
-          
-          ${stat.countPKL > 0 ? `
-          <div class="mt-3 bg-purple-50 border-l-4 border-purple-500 p-3 rounded">
-            <p class="text-sm text-purple-800">
-              <strong>💼 Info:</strong> Siswa sedang/pernah melaksanakan PKL selama ${stat.countPKL} hari (tercatat hadir).
+              <strong>⚠️ Perhatian:</strong> Siswa ini memiliki ${stat.countA} hari alpha. Perlu tindak lanjut dari wali kelas.
             </p>
           </div>
           ` : ''}
@@ -1725,7 +1334,7 @@
       });
     }
 
-    // Utility functions
+    // Utility Functions
     function showLoading(show) {
       const overlay = document.getElementById('loadingOverlay');
       overlay.classList.toggle('hidden', !show);
@@ -1748,12 +1357,12 @@
       }, 3000);
     }
 
-    // Event listeners
+    // Event Listeners
     document.getElementById('inputClass').addEventListener('change', loadAttendanceForm);
     document.getElementById('inputDate').addEventListener('change', loadAttendanceForm);
 
-    // Initialize app
+    // Initialize App
     initializeApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab983ef21bf4ab2',t:'MTc2NTMzNTg3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab9ba5dc7b86d18',t:'MTc2NTMzODEwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
