@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Presensi Siswa - SMK NEGERI 4 JAKARTA</title>
-  <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/124555450?v=4">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -455,8 +454,8 @@
     </div>
    </main><!-- Loading Overlay -->
    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-8 text-center">
-     <div class="spinner w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+    <div class="bg-white rounded-xl p-8 text-center"><img src="https://i.imgur.com/UVQedhI.png" alt="Loading..." class="w-32 h-32 mx-auto mb-4" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+     <div class="spinner w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" style="display: none;"></div>
      <p class="text-gray-700 font-semibold">Memproses...</p>
     </div>
    </div><!-- Confirmation Modal -->
@@ -1322,25 +1321,35 @@
       const studentStats = filteredStudents.map(student => {
         let studentAttendance = attendanceData.filter(a => a.student_id === student.id);
         
+        // Filter berdasarkan periode yang dipilih
         if (period !== 'all') {
           const now = new Date();
           let startDate;
           
           if (period === 'month') {
+            // Bulan ini: dari tanggal 1 bulan ini
             startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           } else if (period === 'last30') {
+            // 30 hari terakhir: dari 30 hari yang lalu
             startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
           } else if (period === 'semester') {
-            const currentMonth = now.getMonth() + 1;
+            // Semester ini: Juli-Desember (Ganjil) atau Januari-Juni (Genap)
+            const currentMonth = now.getMonth() + 1; // 1-12
             if (currentMonth >= 7) {
-              startDate = new Date(now.getFullYear(), 6, 1);
+              // Semester Ganjil: Juli (bulan ke-6 dalam index 0) - Desember
+              startDate = new Date(now.getFullYear(), 6, 1); // Juli = bulan index 6
             } else {
-              startDate = new Date(now.getFullYear(), 0, 1);
+              // Semester Genap: Januari - Juni
+              startDate = new Date(now.getFullYear(), 0, 1); // Januari = bulan index 0
             }
           }
           
-          studentAttendance = studentAttendance.filter(a => new Date(a.attendance_date) >= startDate);
+          // Filter attendance berdasarkan attendance_date (bukan created_at)
+          studentAttendance = studentAttendance.filter(a => {
+            const attDate = new Date(a.attendance_date);
+            return attDate >= startDate;
+          });
         }
         
         const countH = studentAttendance.filter(a => a.status === 'H').length;
@@ -1481,46 +1490,66 @@
     }
 
     // Preview Student Recap
-    function previewStudentRecap(studentId) {
-      const student = studentsData.find(s => s.id === studentId);
-      if (!student) return;
-
-      const period = document.getElementById('recapPeriod').value;
-      let studentAttendance = attendanceData.filter(a => a.student_id === student.id);
+    async function previewStudentRecap(studentId) {
+      showLoading(true);
       
-      if (period !== 'all') {
-        const now = new Date();
-        let startDate;
+      try {
+        // Refresh data from database first
+        await loadAttendance();
         
-        if (period === 'month') {
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        } else if (period === 'last30') {
-          startDate = new Date();
-          startDate.setDate(startDate.getDate() - 30);
-        } else if (period === 'semester') {
-          const currentMonth = now.getMonth() + 1;
-          if (currentMonth >= 7) {
-            startDate = new Date(now.getFullYear(), 6, 1);
-          } else {
-            startDate = new Date(now.getFullYear(), 0, 1);
-          }
+        const student = studentsData.find(s => s.id === studentId);
+        if (!student) {
+          showLoading(false);
+          showToast('❌ Data siswa tidak ditemukan', 'error');
+          return;
         }
+
+        const period = document.getElementById('recapPeriod').value;
+        let studentAttendance = attendanceData.filter(a => a.student_id === student.id);
         
-        studentAttendance = studentAttendance.filter(a => new Date(a.attendance_date) >= startDate);
-      }
+        // Filter berdasarkan periode yang sama seperti di renderRecapList
+        if (period !== 'all') {
+          const now = new Date();
+          let startDate;
+          
+          if (period === 'month') {
+            // Bulan ini
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          } else if (period === 'last30') {
+            // 30 hari terakhir
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+          } else if (period === 'semester') {
+            // Semester ini
+            const currentMonth = now.getMonth() + 1;
+            if (currentMonth >= 7) {
+              // Semester Ganjil: Juli - Desember
+              startDate = new Date(now.getFullYear(), 6, 1);
+            } else {
+              // Semester Genap: Januari - Juni
+              startDate = new Date(now.getFullYear(), 0, 1);
+            }
+          }
+          
+          // Filter attendance berdasarkan attendance_date
+          studentAttendance = studentAttendance.filter(a => {
+            const attDate = new Date(a.attendance_date);
+            return attDate >= startDate;
+          });
+        }
 
-      // Sort by date
-      studentAttendance.sort((a, b) => new Date(a.attendance_date) - new Date(b.attendance_date));
+        // Sort by date
+        studentAttendance.sort((a, b) => new Date(a.attendance_date) - new Date(b.attendance_date));
 
-      const countH = studentAttendance.filter(a => a.status === 'H').length;
-      const countPKL = studentAttendance.filter(a => a.status === 'PKL').length;
-      const countS = studentAttendance.filter(a => a.status === 'S').length;
-      const countI = studentAttendance.filter(a => a.status === 'I').length;
-      const countA = studentAttendance.filter(a => a.status === 'A').length;
-      
-      const totalRecords = studentAttendance.length;
-      const presentDays = countH + countPKL;
-      const percentage = totalRecords > 0 ? ((presentDays / totalRecords) * 100).toFixed(1) : 0;
+        const countH = studentAttendance.filter(a => a.status === 'H').length;
+        const countPKL = studentAttendance.filter(a => a.status === 'PKL').length;
+        const countS = studentAttendance.filter(a => a.status === 'S').length;
+        const countI = studentAttendance.filter(a => a.status === 'I').length;
+        const countA = studentAttendance.filter(a => a.status === 'A').length;
+        
+        const totalRecords = studentAttendance.length;
+        const presentDays = countH + countPKL;
+        const percentage = totalRecords > 0 ? ((presentDays / totalRecords) * 100).toFixed(1) : 0;
 
       let periodLabel = 'Semua Data';
       if (period === 'month') periodLabel = 'Bulan Ini';
@@ -1681,12 +1710,19 @@
         </div>
       `;
 
-      document.getElementById('previewContent').innerHTML = previewContent;
-      currentPreviewStudent = { student, attendance: studentAttendance, stats: { countH, countPKL, countS, countI, countA, totalRecords, percentage }, period: periodLabel };
-      
-      const modal = document.getElementById('previewModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+        document.getElementById('previewContent').innerHTML = previewContent;
+        currentPreviewStudent = { student, attendance: studentAttendance, stats: { countH, countPKL, countS, countI, countA, totalRecords, percentage }, period: periodLabel };
+        
+        const modal = document.getElementById('previewModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+      } catch (error) {
+        console.error('Error loading preview:', error);
+        showToast('❌ Gagal memuat preview: ' + error.message, 'error');
+      } finally {
+        showLoading(false);
+      }
     }
 
     // Close Preview
@@ -1760,5 +1796,5 @@
     // Initialize App
     initializeApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab9f595403ea458',t:'MTc2NTM0MDUyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac9b408b4dda3d9',t:'MTc2NTUwNTYxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
