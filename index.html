@@ -247,19 +247,19 @@
        <h2 class="text-2xl font-bold text-gray-800">Input Presensi Harian</h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-       <div><select id="inputClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
+       <div><label for="inputClass" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="inputClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"> <option value="">-- Pilih Kelas --</option> </select>
        </div>
-       <div><input type="date" id="inputDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+       <div><label for="inputDate" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tanggal</label> <input type="date" id="inputDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
        </div>
       </div><!-- Legend -->
       <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-6">
        <p class="text-sm font-semibold text-gray-700 mb-2">📌 Keterangan Status:</p>
        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-green-500"></div><span class="text-xs text-gray-700"><strong>H</strong> = Hadir (default, kolom kosong di Excel)</span>
+         <div class="w-8 h-8 rounded bg-green-500"></div><span class="text-xs text-gray-700"><strong>H</strong> = Hadir</span>
         </div>
         <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-purple-500"></div><span class="text-xs text-gray-700"><strong>PKL</strong> = Praktek Kerja Lapangan (dihitung Hadir)</span>
+         <div class="w-8 h-8 rounded bg-purple-500"></div><span class="text-xs text-gray-700"><strong>PKL</strong> = Praktek Kerja Lapangan</span>
         </div>
         <div class="flex items-center gap-2">
          <div class="w-8 h-8 rounded bg-yellow-500"></div><span class="text-xs text-gray-700"><strong>S</strong> = Sakit</span>
@@ -268,7 +268,7 @@
          <div class="w-8 h-8 rounded bg-blue-500"></div><span class="text-xs text-gray-700"><strong>I</strong> = Izin</span>
         </div>
         <div class="flex items-center gap-2">
-         <div class="w-8 h-8 rounded bg-red-500"></div><span class="text-xs text-gray-700"><strong>A</strong> = Alpha (Tanpa Keterangan)</span>
+         <div class="w-8 h-8 rounded bg-red-500"></div><span class="text-xs text-gray-700"><strong>A</strong> = Alpha</span>
         </div>
        </div>
       </div>
@@ -330,7 +330,7 @@
         </div>
         <div><label for="addClassName" class="block text-sm font-semibold text-gray-700 mb-2">Nama Kelas</label> <input type="text" id="addClassName" required placeholder="Contoh: XI - TKP-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
         </div>
-        <div class="md:col-span-2"><button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg shadow-lg transition-all"> ��� Tambah Siswa </button>
+        <div class="md:col-span-2"><button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg shadow-lg transition-all"> ✅ Tambah Siswa </button>
         </div>
        </form>
       </div><!-- Student List -->
@@ -362,7 +362,7 @@
         <li>• <strong>Baris 9-10:</strong> Header tabel (NO, NIS, NAMA, L/P, Tanggal 1-31, S, I, A, % HADIR)</li>
         <li>• <strong>Baris 11+:</strong> Data siswa dengan status kehadiran</li>
         <li>• <strong>Status H (Hadir):</strong> Kolom tanggal dibiarkan KOSONG</li>
-        <li>• <strong>Status PKL:</strong> Dihitung sebagai HADIR, kolom tanggal dibiarkan KOSONG</li>
+        <li>• <strong>Status PKL:</strong> Ditulis "PKL" di kolom tanggal (dihitung HADIR)</li>
         <li>• <strong>Status S/I/A:</strong> Ditulis hurufnya di kolom tanggal yang sesuai</li>
         <li>• <strong>Rekapitulasi:</strong> Total S, I, A, dan % Kehadiran dihitung otomatis</li>
        </ul>
@@ -391,133 +391,141 @@
        </div>
        <h2 class="text-2xl font-bold text-gray-800">Rekapitulasi Per Siswa</h2>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas</label> <select id="recapClass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="">Semua Kelas</option> </select>
        </div>
-       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recapPeriod" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()"> <option value="all">Semua Data</option> <option value="month">Bulan Ini</option> <option value="last30">30 Hari Terakhir</option> <option value="semester1">Semester 1 (Jul-Des)</option> <option value="semester2">Semester 2 (Jan-Jun)</option> <option value="custom">Rentang Tanggal Kustom</option> </select>
-       </div>
-       <div id="customDateRange" class="hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">Dari Tanggal</label> <input type="date" id="customStartDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 mb-2" onchange="renderRecapList()"> <label class="block text-sm font-semibold text-gray-700 mb-2">Sampai Tanggal</label> <input type="date" id="customEndDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recapPeriod" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="handlePeriodChange()"> <option value="all">Semua Data</option> <option value="month">Bulan Ini</option> <option value="last30">30 Hari Terakhir</option> <option value="semester1">Semester 1 (Jul-Des)</option> <option value="semester2">Semester 2 (Jan-Jun)</option> <option value="custom">Rentang Tanggal Kustom</option> </select>
        </div>
       </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Cari Siswa</label> <input type="text" id="recapSearch" placeholder="Ketik nama atau NIS..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" oninput="renderRecapList()">
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Cari Siswa</label> <input type="text" id="recapSearch" placeholder="Ketik nama atau NIS..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" oninput="renderRecapList()">
-      </div>
-     </div><!-- Summary Cards -->
-     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-4">
-       <div class="flex items-center justify-between">
-        <div>
-         <p class="text-xs font-semibold text-green-700">Rata-rata Hadir</p>
-         <p class="text-2xl font-bold text-green-800"><span id="avgAttendance">0</span>%</p>
-        </div>
-        <div class="bg-green-500 rounded-full p-3">
-         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-         </svg>
-        </div>
+      <div id="customDateRange" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 hidden">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Dari Tanggal</label> <input type="date" id="customStartDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Sampai Tanggal</label> <input type="date" id="customEndDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" onchange="renderRecapList()">
        </div>
       </div>
-      <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200 rounded-xl p-4">
-       <div class="flex items-center justify-between">
-        <div>
-         <p class="text-xs font-semibold text-yellow-700">Total Sakit</p>
-         <p class="text-2xl font-bold text-yellow-800"><span id="totalSick">0</span></p>
-        </div>
-        <div class="bg-yellow-500 rounded-full p-3">
-         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-         </svg>
-        </div>
-       </div>
-      </div>
-      <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-4">
-       <div class="flex items-center justify-between">
-        <div>
-         <p class="text-xs font-semibold text-blue-700">Total Izin</p>
-         <p class="text-2xl font-bold text-blue-800"><span id="totalPermit">0</span></p>
-        </div>
-        <div class="bg-blue-500 rounded-full p-3">
-         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-         </svg>
+      <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">Cari Siswa</label> <input type="text" id="recapSearch" placeholder="Ketik nama atau NIS..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" oninput="renderRecapList()">
+      </div><!-- Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+       <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-xs font-semibold text-green-700">Rata-rata Hadir</p>
+          <p class="text-2xl font-bold text-green-800"><span id="avgAttendance">0</span>%</p>
+         </div>
+         <div class="bg-green-500 rounded-full p-3">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+         </div>
         </div>
        </div>
-      </div>
-      <div class="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-xl p-4">
-       <div class="flex items-center justify-between">
-        <div>
-         <p class="text-xs font-semibold text-red-700">Total Alpha</p>
-         <p class="text-2xl font-bold text-red-800"><span id="totalAbsent">0</span></p>
-        </div>
-        <div class="bg-red-500 rounded-full p-3">
-         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-         </svg>
+       <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-xs font-semibold text-yellow-700">Total Sakit</p>
+          <p class="text-2xl font-bold text-yellow-800"><span id="totalSick">0</span></p>
+         </div>
+         <div class="bg-yellow-500 rounded-full p-3">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+         </div>
         </div>
        </div>
-      </div>
-     </div><!-- Student List with Recap -->
-     <div id="recapList" class="space-y-4"></div>
-    </div>
-   </main>
-  </div> <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-   <div class="bg-white rounded-xl p-8 text-center"><img src="https://i.imgur.com/UVQedhI.png" alt="Loading..." class="w-32 h-32 mx-auto mb-4" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-    <div class="spinner w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" style="display: none;"></div>
-    <p class="text-gray-700 font-semibold">Memproses...</p>
-   </div>
-  </div><!-- Confirmation Modal -->
-  <div id="confirmationModal" class="fixed inset-0 confirmation-overlay hidden items-center justify-center z-50">
-   <div class="confirmation-modal bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
-    <div class="text-center mb-4">
-     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
-      <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-      </svg>
+       <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-xs font-semibold text-blue-700">Total Izin</p>
+          <p class="text-2xl font-bold text-blue-800"><span id="totalPermit">0</span></p>
+         </div>
+         <div class="bg-blue-500 rounded-full p-3">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+         </div>
+        </div>
+       </div>
+       <div class="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-xs font-semibold text-red-700">Total Alpha</p>
+          <p class="text-2xl font-bold text-red-800"><span id="totalAbsent">0</span></p>
+         </div>
+         <div class="bg-red-500 rounded-full p-3">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+         </div>
+        </div>
+       </div>
+      </div><!-- Student List with Recap -->
+      <div id="recapList" class="space-y-4"></div>
      </div>
-     <h3 class="text-lg font-semibold text-gray-900 mb-2" id="confirmationTitle">Konfirmasi</h3>
-     <p class="text-sm text-gray-600" id="confirmationMessage">Apakah Anda yakin?</p>
     </div>
-    <div class="flex gap-3"><button onclick="cancelConfirmation()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 rounded-lg transition-all"> Batal </button> <button id="confirmButton" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all"> Ya, Hapus </button>
+   </main><!-- Loading Overlay -->
+   <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-8 text-center">
+     <div class="spinner w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+     <p class="text-gray-700 font-semibold">Memproses...</p>
     </div>
+   </div><!-- Confirmation Modal -->
+   <div id="confirmationModal" class="fixed inset-0 confirmation-overlay hidden items-center justify-center z-50">
+    <div class="confirmation-modal bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+     <div class="text-center mb-4">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+       <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+       </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2" id="confirmationTitle">Konfirmasi</h3>
+      <p class="text-sm text-gray-600" id="confirmationMessage">Apakah Anda yakin?</p>
+     </div>
+     <div class="flex gap-3"><button onclick="cancelConfirmation()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 rounded-lg transition-all"> Batal </button> <button id="confirmButton" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all"> Ya, Hapus </button>
+     </div>
+    </div>
+   </div><!-- A4 Preview Modal -->
+   <div id="previewModal" class="fixed inset-0 confirmation-overlay hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full a4-modal" style="max-width: 900px;">
+     <div class="no-print bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 rounded-t-xl flex items-center justify-between">
+      <div class="flex items-center gap-3">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+       </svg>
+       <h3 class="text-xl font-bold">Preview Rekapitulasi Presensi</h3>
+      </div><button onclick="closePreview()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+       </svg></button>
+     </div>
+     <div class="no-print bg-gray-100 p-4 flex gap-3 justify-center border-t border-gray-200"><button onclick="printRecap()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+       </svg> 🖨️ Cetak </button> <button onclick="downloadRecapPDF()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+       </svg> 📥 Download PDF </button>
+     </div>
+     <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
+      <div id="previewContent" class="a4-preview"></div>
+     </div>
+    </div>
+   </div><!-- Toast Notification -->
+   <div id="toast" class="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg hidden z-50">
+    <p id="toastMessage"></p>
    </div>
-  </div><!-- A4 Preview Modal -->
-  <div id="previewModal" class="fixed inset-0 confirmation-overlay hidden items-center justify-center z-50 p-4">
-   <div class="bg-white rounded-xl shadow-2xl w-full a4-modal" style="max-width: 900px;">
-    <div class="no-print bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 rounded-t-xl flex items-center justify-between">
-     <div class="flex items-center gap-3">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-      </svg>
-      <h3 class="text-xl font-bold">Preview Rekapitulasi Presensi</h3>
-     </div><button onclick="closePreview()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg></button>
-    </div>
-    <div class="no-print bg-gray-100 p-4 flex gap-3 justify-center border-t border-gray-200"><button onclick="printRecap()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-      </svg> 🖨️ Cetak </button> <button onclick="downloadRecapPDF()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all flex items-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-      </svg> 📥 Download PDF </button>
-    </div>
-    <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
-     <div id="previewContent" class="a4-preview"></div>
-    </div>
-   </div>
-  </div><!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg hidden z-50">
-   <p id="toastMessage"></p>
   </div>
   <script>
-    // Supabase Configuration
+    // =====================================================
+    // SUPABASE CONFIGURATION
+    // =====================================================
     const SUPABASE_URL = 'https://xkvwtnbvierjgfbhhbeg.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhrdnd0bmJ2aWVyamdmYmhoYmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzMzA5MzMsImV4cCI6MjA4MDkwNjkzM30.6NLqvOnX3IqY1FVjJH0sfeW08W-Bp4D6k9ztqKvtw50';
     
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Global State
+    // =====================================================
+    // GLOBAL STATE
+    // =====================================================
     let studentsData = [];
     let attendanceData = [];
     let currentTab = 'input';
     let pendingConfirmAction = null;
     let currentPreviewStudent = null;
 
-    // Initialize App
+    // =====================================================
+    // INITIALIZE APP
+    // =====================================================
     async function initializeApp() {
       showLoading(true);
       
@@ -525,7 +533,11 @@
         await loadStudents();
         await loadAttendance();
         
-        document.getElementById('inputDate').valueAsDate = new Date();
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('inputDate').value = today;
+        
+        // Set default month to current month
         const currentMonth = new Date().toISOString().slice(0, 7);
         document.getElementById('reportMonth').value = currentMonth;
         
@@ -539,13 +551,17 @@
       }
     }
 
+    // =====================================================
+    // DATABASE OPERATIONS
+    // =====================================================
+    
     // Load Students from Supabase
     async function loadStudents() {
       const { data, error } = await supabase
         .from('students')
         .select('*')
         .eq('is_active', true)
-        .order('className')
+        .order('classname')
         .order('name');
       
       if (error) throw error;
@@ -563,7 +579,10 @@
       attendanceData = data || [];
     }
 
-    // Update UI
+    // =====================================================
+    // UI UPDATE FUNCTIONS
+    // =====================================================
+    
     function updateUI() {
       updateStats();
       populateClassDropdowns();
@@ -577,14 +596,12 @@
       }
     }
 
-    // Update Statistics
     function updateStats() {
       document.getElementById('totalStudents').textContent = studentsData.length;
-      const uniqueClasses = [...new Set(studentsData.map(s => s.className))];
+      const uniqueClasses = [...new Set(studentsData.map(s => s.classname))];
       document.getElementById('totalClasses').textContent = uniqueClasses.length;
     }
 
-    // Populate Class Dropdowns
     function populateClassDropdowns() {
       const dropdowns = ['inputClass', 'reportClass', 'filterClass', 'recapClass'];
       dropdowns.forEach(id => {
@@ -597,9 +614,9 @@
           select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
         }
         
-        const uniqueClasses = [...new Set(studentsData.map(s => s.className))].sort();
+        const uniqueClasses = [...new Set(studentsData.map(s => s.classname))].sort();
         uniqueClasses.forEach(className => {
-          const studentsInClass = studentsData.filter(s => s.className === className);
+          const studentsInClass = studentsData.filter(s => s.classname === className);
           const option = document.createElement('option');
           option.value = className;
           
@@ -616,27 +633,36 @@
       });
     }
 
-    // Switch Tabs
+    // =====================================================
+    // TAB NAVIGATION
+    // =====================================================
+    
     function switchTab(tab) {
       currentTab = tab;
       
+      // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(el => {
         el.classList.add('hidden');
         el.classList.remove('slide-in');
       });
+      
+      // Reset all tab buttons
       document.querySelectorAll('nav button').forEach(btn => {
         btn.classList.remove('tab-active');
         btn.classList.add('tab-inactive');
       });
       
+      // Show selected tab
       const contentEl = document.getElementById(`content-${tab}`);
       contentEl.classList.remove('hidden');
       contentEl.classList.add('slide-in');
       
+      // Activate selected button
       const activeBtn = document.getElementById(`tab-${tab}`);
       activeBtn.classList.add('tab-active');
       activeBtn.classList.remove('tab-inactive');
       
+      // Load tab-specific content
       if (tab === 'manage') {
         renderStudentList();
       } else if (tab === 'input') {
@@ -646,7 +672,10 @@
       }
     }
 
-    // Load Attendance Form
+    // =====================================================
+    // INPUT PRESENSI (TAB 1)
+    // =====================================================
+    
     function loadAttendanceForm() {
       const className = document.getElementById('inputClass').value;
       const date = document.getElementById('inputDate').value;
@@ -659,7 +688,7 @@
         return;
       }
       
-      const classStudents = studentsData.filter(s => s.className === className)
+      const classStudents = studentsData.filter(s => s.classname === className)
         .sort((a, b) => a.name.localeCompare(b.name));
       
       if (classStudents.length === 0) {
@@ -706,7 +735,6 @@
       });
     }
 
-    // Set Attendance Status
     function setStatus(studentId, status) {
       const buttons = document.querySelectorAll(`button[data-student="${studentId}"]`);
       buttons.forEach(btn => {
@@ -725,13 +753,12 @@
       }
     }
 
-    // Save Attendance
     async function saveAttendance() {
       const className = document.getElementById('inputClass').value;
       const date = document.getElementById('inputDate').value;
       
       if (!className || !date) {
-        showToast('Pilih kelas dan tanggal terlebih dahulu', 'error');
+        showToast('❌ Pilih kelas dan tanggal terlebih dahulu', 'error');
         return;
       }
       
@@ -741,7 +768,7 @@
       saveBtn.textContent = '⏳ Menyimpan...';
       
       try {
-        const classStudents = studentsData.filter(s => s.className === className);
+        const classStudents = studentsData.filter(s => s.classname === className);
         const attendanceRecords = [];
         
         classStudents.forEach(student => {
@@ -760,6 +787,7 @@
           });
         });
         
+        // Upsert: Insert or Update if exists
         const { error } = await supabase
           .from('attendance')
           .upsert(attendanceRecords, {
@@ -780,7 +808,10 @@
       }
     }
 
-    // Download Template
+    // =====================================================
+    // KELOLA DATA SISWA (TAB 2)
+    // =====================================================
+    
     function downloadTemplate() {
       showLoading(true);
       
@@ -840,11 +871,12 @@
         
         const ws = XLSX.utils.aoa_to_sheet(data);
         
+        // Set column widths
         const cols = [
-          { wch: 5 },
-          { wch: 12 },
-          { wch: 30 },
-          { wch: 5 },
+          { wch: 5 },   // NO
+          { wch: 12 },  // NIS
+          { wch: 30 },  // NAMA
+          { wch: 5 },   // L/P
         ];
         
         for (let i = 0; i < 31; i++) {
@@ -863,7 +895,6 @@
       }, 500);
     }
 
-    // Import Excel
     async function importExcel() {
       const fileInput = document.getElementById('excelFile');
       const file = fileInput.files[0];
@@ -900,6 +931,7 @@
             const name = String(row[2]).trim();
             const gender = String(row[3]).trim().toUpperCase();
             
+            // Check if NIS already exists
             const exists = studentsData.find(s => s.nis === nis);
             if (exists) continue;
             
@@ -907,7 +939,7 @@
               nis: nis,
               name: name,
               gender: gender === 'L' || gender === 'P' ? gender : 'L',
-              className: className,
+              classname: className,
               is_active: true
             });
           }
@@ -953,7 +985,7 @@
       
       const exists = studentsData.find(s => s.nis === nis);
       if (exists) {
-        showToast('NIS sudah terdaftar!', 'error');
+        showToast('❌ NIS sudah terdaftar!', 'error');
         return;
       }
       
@@ -966,7 +998,7 @@
             nis: nis,
             name: name,
             gender: gender,
-            className: className,
+            classname: className,
             is_active: true
           }]);
         
@@ -985,14 +1017,13 @@
       }
     });
 
-    // Render Student List
     function renderStudentList() {
       const filterClass = document.getElementById('filterClass').value;
       const container = document.getElementById('studentList');
       
       let filteredStudents = studentsData;
       if (filterClass) {
-        filteredStudents = filteredStudents.filter(s => s.className === filterClass);
+        filteredStudents = filteredStudents.filter(s => s.classname === filterClass);
       }
       
       filteredStudents.sort((a, b) => a.name.localeCompare(b.name));
@@ -1010,7 +1041,7 @@
           <div class="flex-1">
             <p class="font-semibold text-gray-800">${index + 1}. ${student.name}</p>
             <div class="flex items-center gap-2 mt-1">
-              <p class="text-sm text-gray-600">NIS: ${student.nis} | ${student.gender === 'L' ? '👨 Laki-laki' : '👩 Perempuan'} | Kelas: ${student.className}</p>
+              <p class="text-sm text-gray-600">NIS: ${student.nis} | ${student.gender === 'L' ? '👨 Laki-laki' : '👩 Perempuan'} | Kelas: ${student.classname}</p>
             </div>
           </div>
           <button onclick="deleteStudent('${student.id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-all">
@@ -1021,7 +1052,7 @@
       });
     }
 
-    // Show Confirmation Modal
+    // Confirmation Modal Functions
     function showConfirmation(title, message, onConfirm) {
       document.getElementById('confirmationTitle').textContent = title;
       document.getElementById('confirmationMessage').textContent = message;
@@ -1035,7 +1066,6 @@
       document.getElementById('confirmButton').onclick = executeConfirmation;
     }
 
-    // Execute Confirmation
     function executeConfirmation() {
       if (pendingConfirmAction) {
         pendingConfirmAction();
@@ -1044,7 +1074,6 @@
       cancelConfirmation();
     }
 
-    // Cancel Confirmation
     function cancelConfirmation() {
       const modal = document.getElementById('confirmationModal');
       modal.classList.add('hidden');
@@ -1052,7 +1081,6 @@
       pendingConfirmAction = null;
     }
 
-    // Delete Student
     async function deleteStudent(studentId) {
       const student = studentsData.find(s => s.id === studentId);
       if (!student) return;
@@ -1086,19 +1114,18 @@
       );
     }
 
-    // Delete by Class
     async function deleteByClass() {
       const filterClass = document.getElementById('filterClass').value;
       
       if (!filterClass) {
-        showToast('Pilih kelas terlebih dahulu dari filter dropdown', 'error');
+        showToast('❌ Pilih kelas terlebih dahulu dari filter dropdown', 'error');
         return;
       }
       
-      const studentsToDelete = studentsData.filter(s => s.className === filterClass);
+      const studentsToDelete = studentsData.filter(s => s.classname === filterClass);
       
       if (studentsToDelete.length === 0) {
-        showToast('Tidak ada siswa di kelas ini', 'error');
+        showToast('❌ Tidak ada siswa di kelas ini', 'error');
         return;
       }
       
@@ -1133,10 +1160,9 @@
       );
     }
 
-    // Delete All Students
     async function deleteAllStudents() {
       if (studentsData.length === 0) {
-        showToast('Tidak ada siswa untuk dihapus', 'error');
+        showToast('❌ Tidak ada siswa untuk dihapus', 'error');
         return;
       }
       
@@ -1172,13 +1198,16 @@
       );
     }
 
-    // Generate Report
+    // =====================================================
+    // LAPORAN BULANAN (TAB 3)
+    // =====================================================
+    
     async function generateReport() {
       const className = document.getElementById('reportClass').value;
       const monthYear = document.getElementById('reportMonth').value;
       
       if (!className || !monthYear) {
-        showToast('Pilih kelas dan bulan terlebih dahulu', 'error');
+        showToast('❌ Pilih kelas dan bulan terlebih dahulu', 'error');
         return;
       }
       
@@ -1190,7 +1219,7 @@
                             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const monthName = monthNames[parseInt(month) - 1];
         
-        const classStudents = studentsData.filter(s => s.className === className)
+        const classStudents = studentsData.filter(s => s.classname === className)
           .sort((a, b) => a.name.localeCompare(b.name));
         
         const daysInMonth = new Date(year, month, 0).getDate();
@@ -1198,7 +1227,7 @@
         const wb = XLSX.utils.book_new();
         const data = [];
         
-        // Header (Baris 1-8) - Persis seperti template
+        // Header (Baris 1-8)
         data.push(['SMK NEGERI 4 JAKARTA']);
         data.push(['DAFTAR HADIR SISWA']);
         data.push([`TAHUN PELAJARAN 2025/2026`]);
@@ -1240,8 +1269,10 @@
             const attendance = attendanceData.find(a => a.student_id === student.id && a.attendance_date === dateStr);
             
             if (attendance) {
-              if (attendance.status === 'H' || attendance.status === 'PKL') {
-                row.push(''); // Hadir dan PKL = kosong (dihitung hadir)
+              if (attendance.status === 'H') {
+                row.push(''); // Hadir = kosong
+              } else if (attendance.status === 'PKL') {
+                row.push('PKL'); // PKL ditulis
               } else {
                 row.push(attendance.status); // S, I, atau A
                 if (attendance.status === 'S') totalS++;
@@ -1256,7 +1287,7 @@
           // Kolom rekapitulasi
           row.push(totalS, totalI, totalA);
           
-          // Perhitungan % Hadir
+          // Perhitungan % Hadir (H + PKL dihitung hadir)
           const totalPresent = daysInMonth - (totalS + totalI + totalA);
           const percentage = ((totalPresent / daysInMonth) * 100).toFixed(1);
           row.push(`${percentage}%`);
@@ -1268,7 +1299,7 @@
         data.push([]);
         data.push(['KETERANGAN:']);
         data.push(['H = Hadir (kolom tanggal kosong)']);
-        data.push(['PKL = Praktek Kerja Lapangan (dihitung Hadir, kolom tanggal kosong)']);
+        data.push(['PKL = Praktek Kerja Lapangan (dihitung Hadir)']);
         data.push(['S = Sakit']);
         data.push(['I = Izin']);
         data.push(['A = Alpha (tanpa keterangan)']);
@@ -1277,10 +1308,10 @@
         
         // Set column widths
         ws['!cols'] = [
-          { wch: 5 },
-          { wch: 12 },
-          { wch: 30 },
-          { wch: 5 },
+          { wch: 5 },   // NO
+          { wch: 12 },  // NIS
+          { wch: 30 },  // NAMA
+          { wch: 5 },   // L/P
         ];
         
         for (let i = 0; i < daysInMonth; i++) {
@@ -1298,26 +1329,37 @@
       }, 500);
     }
 
-    // Render Recap List
-    function renderRecapList() {
-      const filterClass = document.getElementById('recapClass').value;
+    // =====================================================
+    // REKAPITULASI PER SISWA (TAB 4)
+    // =====================================================
+    
+    function handlePeriodChange() {
       const period = document.getElementById('recapPeriod').value;
-      const searchQuery = document.getElementById('recapSearch').value.toLowerCase().trim();
-      const container = document.getElementById('recapList');
-      
-      // Show/hide custom date range
       const customDateRange = document.getElementById('customDateRange');
+      
       if (period === 'custom') {
         customDateRange.classList.remove('hidden');
       } else {
         customDateRange.classList.add('hidden');
       }
       
+      renderRecapList();
+    }
+
+    function renderRecapList() {
+      const filterClass = document.getElementById('recapClass').value;
+      const period = document.getElementById('recapPeriod').value;
+      const searchQuery = document.getElementById('recapSearch').value.toLowerCase().trim();
+      const container = document.getElementById('recapList');
+      
       let filteredStudents = studentsData;
       
+      // Filter by class
       if (filterClass) {
-        filteredStudents = filteredStudents.filter(s => s.className === filterClass);
+        filteredStudents = filteredStudents.filter(s => s.classname === filterClass);
       }
+      
+      // Filter by search
       if (searchQuery) {
         filteredStudents = filteredStudents.filter(s => 
           s.name.toLowerCase().includes(searchQuery) || 
@@ -1327,39 +1369,39 @@
       
       filteredStudents.sort((a, b) => a.name.localeCompare(b.name));
       
+      // Calculate statistics for each student
       let totalHadir = 0, totalSick = 0, totalPermit = 0, totalAbsent = 0;
       let totalDays = 0;
       
       const studentStats = filteredStudents.map(student => {
         let studentAttendance = attendanceData.filter(a => a.student_id === student.id);
         
-        // Filter berdasarkan periode yang dipilih
+        // Filter by period
         if (period !== 'all') {
           const now = new Date();
           let startDate, endDate;
           
           if (period === 'month') {
-            // Bulan ini: dari tanggal 1 bulan ini sampai akhir bulan
+            // Current month
             startDate = new Date(now.getFullYear(), now.getMonth(), 1);
             endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
           } else if (period === 'last30') {
-            // 30 hari terakhir
-            endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            // Last 30 days
+            endDate = new Date();
             startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
-            startDate.setHours(0, 0, 0, 0);
           } else if (period === 'semester1') {
-            // Semester 1: Juli - Desember (tahun ajaran berjalan)
+            // Semester 1: July - December
             const currentMonth = now.getMonth() + 1; // 1-12
             const academicYear = currentMonth >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-            startDate = new Date(academicYear, 6, 1, 0, 0, 0); // 1 Juli
-            endDate = new Date(academicYear, 11, 31, 23, 59, 59); // 31 Desember
+            startDate = new Date(academicYear, 6, 1); // July 1
+            endDate = new Date(academicYear, 11, 31, 23, 59, 59); // December 31
           } else if (period === 'semester2') {
-            // Semester 2: Januari - Juni (tahun ajaran berjalan)
+            // Semester 2: January - June
             const currentMonth = now.getMonth() + 1; // 1-12
             const academicYear = currentMonth >= 7 ? now.getFullYear() + 1 : now.getFullYear();
-            startDate = new Date(academicYear, 0, 1, 0, 0, 0); // 1 Januari
-            endDate = new Date(academicYear, 5, 30, 23, 59, 59); // 30 Juni
+            startDate = new Date(academicYear, 0, 1); // January 1
+            endDate = new Date(academicYear, 5, 30, 23, 59, 59); // June 30
           } else if (period === 'custom') {
             // Custom date range
             const customStart = document.getElementById('customStartDate').value;
@@ -1367,20 +1409,15 @@
             
             if (customStart && customEnd) {
               startDate = new Date(customStart);
-              startDate.setHours(0, 0, 0, 0);
               endDate = new Date(customEnd);
               endDate.setHours(23, 59, 59, 999);
-            } else {
-              // Jika belum diisi, gunakan semua data
-              startDate = null;
-              endDate = null;
             }
           }
           
-          // Filter attendance berdasarkan attendance_date
+          // Filter attendance by date range
           if (startDate && endDate) {
             studentAttendance = studentAttendance.filter(a => {
-              const attDate = new Date(a.attendance_date + 'T00:00:00');
+              const attDate = new Date(a.attendance_date);
               return attDate >= startDate && attDate <= endDate;
             });
           }
@@ -1416,6 +1453,7 @@
         };
       });
       
+      // Update summary cards
       const avgAttendance = totalDays > 0 ? ((totalHadir / totalDays) * 100).toFixed(1) : 0;
       document.getElementById('avgAttendance').textContent = avgAttendance;
       document.getElementById('totalSick').textContent = totalSick;
@@ -1461,7 +1499,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-2 mt-2">
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">${student.className}</span>
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">${student.classname}</span>
               </div>
             </div>
             <div class="text-right">
@@ -1523,12 +1561,15 @@
       });
     }
 
-    // Preview Student Recap
+    // =====================================================
+    // PREVIEW & PRINT FUNCTIONS
+    // =====================================================
+    
     async function previewStudentRecap(studentId) {
       showLoading(true);
       
       try {
-        // Refresh data from database first
+        // Refresh data
         await loadAttendance();
         
         const student = studentsData.find(s => s.id === studentId);
@@ -1541,53 +1582,42 @@
         const period = document.getElementById('recapPeriod').value;
         let studentAttendance = attendanceData.filter(a => a.student_id === student.id);
         
-        // Filter berdasarkan periode yang sama seperti di renderRecapList
+        // Filter by period (same logic as renderRecapList)
         if (period !== 'all') {
           const now = new Date();
           let startDate, endDate;
           
           if (period === 'month') {
-            // Bulan ini
             startDate = new Date(now.getFullYear(), now.getMonth(), 1);
             endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
           } else if (period === 'last30') {
-            // 30 hari terakhir
-            endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            endDate = new Date();
             startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
-            startDate.setHours(0, 0, 0, 0);
           } else if (period === 'semester1') {
-            // Semester 1: Juli - Desember
             const currentMonth = now.getMonth() + 1;
             const academicYear = currentMonth >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-            startDate = new Date(academicYear, 6, 1, 0, 0, 0);
+            startDate = new Date(academicYear, 6, 1);
             endDate = new Date(academicYear, 11, 31, 23, 59, 59);
           } else if (period === 'semester2') {
-            // Semester 2: Januari - Juni
             const currentMonth = now.getMonth() + 1;
             const academicYear = currentMonth >= 7 ? now.getFullYear() + 1 : now.getFullYear();
-            startDate = new Date(academicYear, 0, 1, 0, 0, 0);
+            startDate = new Date(academicYear, 0, 1);
             endDate = new Date(academicYear, 5, 30, 23, 59, 59);
           } else if (period === 'custom') {
-            // Custom date range
             const customStart = document.getElementById('customStartDate').value;
             const customEnd = document.getElementById('customEndDate').value;
             
             if (customStart && customEnd) {
               startDate = new Date(customStart);
-              startDate.setHours(0, 0, 0, 0);
               endDate = new Date(customEnd);
               endDate.setHours(23, 59, 59, 999);
-            } else {
-              startDate = null;
-              endDate = null;
             }
           }
           
-          // Filter attendance berdasarkan attendance_date
           if (startDate && endDate) {
             studentAttendance = studentAttendance.filter(a => {
-              const attDate = new Date(a.attendance_date + 'T00:00:00');
+              const attDate = new Date(a.attendance_date);
               return attDate >= startDate && attDate <= endDate;
             });
           }
@@ -1606,176 +1636,176 @@
         const presentDays = countH + countPKL;
         const percentage = totalRecords > 0 ? ((presentDays / totalRecords) * 100).toFixed(1) : 0;
 
-      let periodLabel = 'Semua Data';
-      if (period === 'month') periodLabel = 'Bulan Ini';
-      else if (period === 'last30') periodLabel = '30 Hari Terakhir';
-      else if (period === 'semester1') periodLabel = 'Semester 1 (Juli - Desember)';
-      else if (period === 'semester2') periodLabel = 'Semester 2 (Januari - Juni)';
-      else if (period === 'custom') {
-        const customStart = document.getElementById('customStartDate').value;
-        const customEnd = document.getElementById('customEndDate').value;
-        if (customStart && customEnd) {
-          const startFormatted = new Date(customStart).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-          const endFormatted = new Date(customEnd).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-          periodLabel = `${startFormatted} s/d ${endFormatted}`;
-        } else {
-          periodLabel = 'Rentang Kustom (Belum diisi)';
+        let periodLabel = 'Semua Data';
+        if (period === 'month') periodLabel = 'Bulan Ini';
+        else if (period === 'last30') periodLabel = '30 Hari Terakhir';
+        else if (period === 'semester1') periodLabel = 'Semester 1 (Juli - Desember)';
+        else if (period === 'semester2') periodLabel = 'Semester 2 (Januari - Juni)';
+        else if (period === 'custom') {
+          const customStart = document.getElementById('customStartDate').value;
+          const customEnd = document.getElementById('customEndDate').value;
+          if (customStart && customEnd) {
+            const startFormatted = new Date(customStart).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            const endFormatted = new Date(customEnd).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            periodLabel = `${startFormatted} s/d ${endFormatted}`;
+          } else {
+            periodLabel = 'Rentang Kustom (Belum diisi)';
+          }
         }
-      }
 
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('id-ID', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-
-      // Generate attendance table rows
-      let attendanceRows = '';
-      studentAttendance.forEach((att, index) => {
-        const date = new Date(att.attendance_date);
-        const dateFormatted = date.toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('id-ID', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
         });
-        
-        const statusLabel = att.status === 'H' ? 'Hadir' : 
-                           att.status === 'PKL' ? 'PKL' :
-                           att.status === 'S' ? 'Sakit' :
-                           att.status === 'I' ? 'Izin' : 'Alpha';
-        
-        attendanceRows += `
-          <tr>
-            <td style="text-align: center;">${index + 1}</td>
-            <td>${dateFormatted}</td>
-            <td style="text-align: center;">${statusLabel}</td>
-          </tr>
-        `;
-      });
 
-      if (studentAttendance.length === 0) {
-        attendanceRows = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #6b7280;">Belum ada data presensi</td></tr>';
-      }
+        // Generate attendance table rows
+        let attendanceRows = '';
+        studentAttendance.forEach((att, index) => {
+          const date = new Date(att.attendance_date);
+          const dateFormatted = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+          
+          const statusLabel = att.status === 'H' ? 'Hadir' : 
+                             att.status === 'PKL' ? 'PKL' :
+                             att.status === 'S' ? 'Sakit' :
+                             att.status === 'I' ? 'Izin' : 'Alpha';
+          
+          attendanceRows += `
+            <tr>
+              <td style="text-align: center;">${index + 1}</td>
+              <td>${dateFormatted}</td>
+              <td style="text-align: center;">${statusLabel}</td>
+            </tr>
+          `;
+        });
 
-      const previewContent = `
-        <div class="print-header">
-          <h1>SMK NEGERI 4 JAKARTA</h1>
-          <h2>REKAPITULASI PRESENSI SISWA</h2>
-          <p>Tahun Pelajaran 2025/2026</p>
-          <p>Periode: ${periodLabel}</p>
-        </div>
+        if (studentAttendance.length === 0) {
+          attendanceRows = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #6b7280;">Belum ada data presensi untuk periode ini</td></tr>';
+        }
 
-        <div class="student-info">
-          <table>
-            <tr>
-              <td style="width: 150px;"><strong>NIS</strong></td>
-              <td style="width: 20px;">:</td>
-              <td>${student.nis}</td>
-            </tr>
-            <tr>
-              <td><strong>Nama Lengkap</strong></td>
-              <td>:</td>
-              <td>${student.name}</td>
-            </tr>
-            <tr>
-              <td><strong>Jenis Kelamin</strong></td>
-              <td>:</td>
-              <td>${student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
-            </tr>
-            <tr>
-              <td><strong>Kelas</strong></td>
-              <td>:</td>
-              <td>${student.className}</td>
-            </tr>
+        const previewContent = `
+          <div class="print-header">
+            <h1>SMK NEGERI 4 JAKARTA</h1>
+            <h2>REKAPITULASI PRESENSI SISWA</h2>
+            <p>Tahun Pelajaran 2025/2026</p>
+            <p>Periode: ${periodLabel}</p>
+          </div>
+
+          <div class="student-info">
+            <table>
+              <tr>
+                <td style="width: 150px;"><strong>NIS</strong></td>
+                <td style="width: 20px;">:</td>
+                <td>${student.nis}</td>
+              </tr>
+              <tr>
+                <td><strong>Nama Lengkap</strong></td>
+                <td>:</td>
+                <td>${student.name}</td>
+              </tr>
+              <tr>
+                <td><strong>Jenis Kelamin</strong></td>
+                <td>:</td>
+                <td>${student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+              </tr>
+              <tr>
+                <td><strong>Kelas</strong></td>
+                <td>:</td>
+                <td>${student.classname}</td>
+              </tr>
+            </table>
+          </div>
+
+          <table class="print-table">
+            <thead>
+              <tr>
+                <th colspan="3" style="background-color: #3b82f6; color: white;">RINGKASAN KEHADIRAN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Total Hari Tercatat</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${totalRecords} hari</strong></td>
+              </tr>
+              <tr style="background-color: #d1fae5;">
+                <td><strong>Hadir (H)</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${countH} hari</strong></td>
+              </tr>
+              <tr style="background-color: #e9d5ff;">
+                <td><strong>PKL</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${countPKL} hari</strong></td>
+              </tr>
+              <tr style="background-color: #fef3c7;">
+                <td><strong>Sakit (S)</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${countS} hari</strong></td>
+              </tr>
+              <tr style="background-color: #dbeafe;">
+                <td><strong>Izin (I)</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${countI} hari</strong></td>
+              </tr>
+              <tr style="background-color: #fee2e2;">
+                <td><strong>Alpha (A)</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${countA} hari</strong></td>
+              </tr>
+              <tr style="background-color: #3b82f6; color: white;">
+                <td><strong>PERSENTASE KEHADIRAN</strong></td>
+                <td style="text-align: center;">:</td>
+                <td style="text-align: center;"><strong>${percentage}%</strong></td>
+              </tr>
+            </tbody>
           </table>
-        </div>
 
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th colspan="3" style="background-color: #3b82f6; color: white;">RINGKASAN KEHADIRAN</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Total Hari Tercatat</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${totalRecords} hari</strong></td>
-            </tr>
-            <tr style="background-color: #d1fae5;">
-              <td><strong>Hadir (H)</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${countH} hari</strong></td>
-            </tr>
-            <tr style="background-color: #e9d5ff;">
-              <td><strong>PKL</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${countPKL} hari</strong></td>
-            </tr>
-            <tr style="background-color: #fef3c7;">
-              <td><strong>Sakit (S)</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${countS} hari</strong></td>
-            </tr>
-            <tr style="background-color: #dbeafe;">
-              <td><strong>Izin (I)</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${countI} hari</strong></td>
-            </tr>
-            <tr style="background-color: #fee2e2;">
-              <td><strong>Alpha (A)</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${countA} hari</strong></td>
-            </tr>
-            <tr style="background-color: #3b82f6; color: white;">
-              <td><strong>PERSENTASE KEHADIRAN</strong></td>
-              <td style="text-align: center;">:</td>
-              <td style="text-align: center;"><strong>${percentage}%</strong></td>
-            </tr>
-          </tbody>
-        </table>
+          <table class="print-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">NO</th>
+                <th>TANGGAL</th>
+                <th style="width: 150px;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${attendanceRows}
+            </tbody>
+          </table>
 
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th style="width: 50px;">NO</th>
-              <th>TANGGAL</th>
-              <th style="width: 150px;">STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${attendanceRows}
-          </tbody>
-        </table>
-
-        <div class="signature-section">
-          <div class="signature-box">
-            <p>Mengetahui,</p>
-            <p><strong>Wali Kelas</strong></p>
-            <div class="signature-line">
-              <p>(...............................................)</p>
+          <div class="signature-section">
+            <div class="signature-box">
+              <p>Mengetahui,</p>
+              <p><strong>Wali Kelas</strong></p>
+              <div class="signature-line">
+                <p>(...............................................)</p>
+              </div>
+            </div>
+            <div class="signature-box">
+              <p>Jakarta, ${dateStr}</p>
+              <p><strong>Orang Tua/Wali</strong></p>
+              <div class="signature-line">
+                <p>(...............................................)</p>
+              </div>
             </div>
           </div>
-          <div class="signature-box">
-            <p>Jakarta, ${dateStr}</p>
-            <p><strong>Orang Tua/Wali</strong></p>
-            <div class="signature-line">
-              <p>(...............................................)</p>
-            </div>
-          </div>
-        </div>
 
-        <div style="margin-top: 30px; padding: 10px; background-color: #f3f4f6; border-left: 4px solid #3b82f6; font-size: 9pt;">
-          <p><strong>Catatan:</strong></p>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>H = Hadir | PKL = Praktek Kerja Lapangan (dihitung Hadir)</li>
-            <li>S = Sakit | I = Izin | A = Alpha (Tanpa Keterangan)</li>
-            <li>Dokumen ini dicetak secara otomatis dari Sistem Presensi SMK NEGERI 4 JAKARTA</li>
-          </ul>
-        </div>
-      `;
+          <div style="margin-top: 30px; padding: 10px; background-color: #f3f4f6; border-left: 4px solid #3b82f6; font-size: 9pt;">
+            <p><strong>Catatan:</strong></p>
+            <ul style="margin: 5px 0; padding-left: 20px;">
+              <li>H = Hadir | PKL = Praktek Kerja Lapangan (dihitung Hadir)</li>
+              <li>S = Sakit | I = Izin | A = Alpha (Tanpa Keterangan)</li>
+              <li>Dokumen ini dicetak secara otomatis dari Sistem Presensi SMK NEGERI 4 JAKARTA</li>
+            </ul>
+          </div>
+        `;
 
         document.getElementById('previewContent').innerHTML = previewContent;
         currentPreviewStudent = { student, attendance: studentAttendance, stats: { countH, countPKL, countS, countI, countA, totalRecords, percentage }, period: periodLabel };
@@ -1792,7 +1822,6 @@
       }
     }
 
-    // Close Preview
     function closePreview() {
       const modal = document.getElementById('previewModal');
       modal.classList.add('hidden');
@@ -1800,12 +1829,10 @@
       currentPreviewStudent = null;
     }
 
-    // Print Recap
     function printRecap() {
       window.print();
     }
 
-    // Download Recap as PDF
     function downloadRecapPDF() {
       if (!currentPreviewStudent) return;
 
@@ -1833,7 +1860,10 @@
       });
     }
 
-    // Utility Functions
+    // =====================================================
+    // UTILITY FUNCTIONS
+    // =====================================================
+    
     function showLoading(show) {
       const overlay = document.getElementById('loadingOverlay');
       overlay.classList.toggle('hidden', !show);
@@ -1856,12 +1886,18 @@
       }, 3000);
     }
 
-    // Event Listeners
+    // =====================================================
+    // EVENT LISTENERS
+    // =====================================================
+    
     document.getElementById('inputClass').addEventListener('change', loadAttendanceForm);
     document.getElementById('inputDate').addEventListener('change', loadAttendanceForm);
 
-    // Initialize App
+    // =====================================================
+    // INITIALIZE APP ON PAGE LOAD
+    // =====================================================
+    
     initializeApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac9f365274f4f6a',t:'MTc2NTUwODIwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aca5bef970ad572',t:'MTc2NTUxMjQ5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
