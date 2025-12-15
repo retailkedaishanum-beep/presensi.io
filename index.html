@@ -1234,43 +1234,73 @@
                     
                     <!-- Detail Attendance -->
                     <h3 style="font-size: 16px; font-weight: bold; margin: 1.5rem 0 1rem 0;">Detail Presensi ${monthName} ${year}</h3>
-                    ${attendance.length > 0 ? `
-                    <table class="print-table" style="font-size: 12px;">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px; text-align: center;">No</th>
-                                <th>Tanggal</th>
-                                <th style="width: 100px; text-align: center;">Status</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${attendance.map((att, i) => `
-                                <tr>
-                                    <td style="text-align: center;">${i + 1}</td>
-                                    <td>${formatDate(att.attendance_date)}</td>
-                                    <td style="text-align: center;">
-                                        <span style="
-                                            display: inline-block;
-                                            padding: 4px 12px;
-                                            border-radius: 12px;
-                                            font-weight: bold;
-                                            font-size: 11px;
-                                            ${att.status === 'H' ? 'background: #dcfce7; color: #166534;' : ''}
-                                            ${att.status === 'PKL' ? 'background: #dbeafe; color: #1e40af;' : ''}
-                                            ${att.status === 'S' ? 'background: #fef3c7; color: #92400e;' : ''}
-                                            ${att.status === 'I' ? 'background: #e0e7ff; color: #3730a3;' : ''}
-                                            ${att.status === 'A' ? 'background: #fee2e2; color: #991b1b;' : ''}
-                                        ">
-                                            ${att.status === 'H' ? 'HADIR' : att.status === 'PKL' ? 'PKL' : att.status === 'S' ? 'SAKIT' : att.status === 'I' ? 'IZIN' : 'ALPHA'}
-                                        </span>
-                                    </td>
-                                    <td>${att.notes || '-'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    ` : '<p style="text-align: center; color: #666; padding: 2rem;">Belum ada data presensi untuk bulan ini</p>'}
+                    ${(() => {
+                        // Hitung jumlah hari dalam bulan
+                        const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+                        
+                        // Loop semua tanggal dari 1 sampai akhir bulan
+                        let tableRows = '';
+                        for (let day = 1; day <= daysInMonth; day++) {
+                            const dayStr = String(day).padStart(2, '0');
+                            const dateStr = `${year}-${month}-${dayStr}`;
+                            
+                            // Cari data presensi untuk tanggal ini
+                            const att = attendance.find(a => a.attendance_date === dateStr);
+                            
+                            if (att) {
+                                // Ada data presensi
+                                tableRows += `
+                                    <tr>
+                                        <td style="text-align: center;">${day}</td>
+                                        <td>${formatDate(dateStr)}</td>
+                                        <td style="text-align: center;">
+                                            <span style="
+                                                display: inline-block;
+                                                padding: 4px 12px;
+                                                border-radius: 12px;
+                                                font-weight: bold;
+                                                font-size: 11px;
+                                                ${att.status === 'H' ? 'background: #dcfce7; color: #166534;' : ''}
+                                                ${att.status === 'PKL' ? 'background: #dbeafe; color: #1e40af;' : ''}
+                                                ${att.status === 'S' ? 'background: #fef3c7; color: #92400e;' : ''}
+                                                ${att.status === 'I' ? 'background: #e0e7ff; color: #3730a3;' : ''}
+                                                ${att.status === 'A' ? 'background: #fee2e2; color: #991b1b;' : ''}
+                                            ">
+                                                ${att.status === 'H' ? 'HADIR' : att.status === 'PKL' ? 'PKL' : att.status === 'S' ? 'SAKIT' : att.status === 'I' ? 'IZIN' : 'ALPHA'}
+                                            </span>
+                                        </td>
+                                        <td>${att.notes || '-'}</td>
+                                    </tr>
+                                `;
+                            } else {
+                                // Tidak ada data presensi - tampilkan baris kosong
+                                tableRows += `
+                                    <tr style="background: #fafafa;">
+                                        <td style="text-align: center; color: #999;">${day}</td>
+                                        <td style="color: #999;">${formatDate(dateStr)}</td>
+                                        <td style="text-align: center; color: #999;">-</td>
+                                        <td style="color: #999; font-style: italic;">Tidak ada data</td>
+                                    </tr>
+                                `;
+                            }
+                        }
+                        
+                        return `
+                            <table class="print-table" style="font-size: 12px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px; text-align: center;">No</th>
+                                        <th>Tanggal</th>
+                                        <th style="width: 100px; text-align: center;">Status</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        `;
+                    })()}
                     
                     <!-- Keterangan -->
                     <div style="margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border-left: 4px solid #3b82f6; font-size: 12px;">
@@ -1966,5 +1996,5 @@
             switchTab('input');
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae3eeb611f74ad7',t:'MTc2NTc4MDY0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae47b2981ce61bc',t:'MTc2NTc4NjQwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
