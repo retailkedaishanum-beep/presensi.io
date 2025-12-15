@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
         body {
             box-sizing: border-box;
@@ -22,9 +23,9 @@
         }
         
         .tab-active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            background: white !important;
+            color: #3b82f6 !important;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
         }
         
         .status-badge {
@@ -46,13 +47,13 @@
         .status-A { background: #fee2e2; color: #991b1b; }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
         }
         
         .card {
@@ -67,22 +68,84 @@
         }
         
         .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            width: 120px;
+            height: 120px;
+            animation: pulse 1.5s ease-in-out infinite;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
         
         .stat-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-left: 4px solid #667eea;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .nav-menu::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-item {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .nav-menu.hidden {
+                display: none;
+            }
+            
+            .nav-menu.show {
+                display: flex;
+            }
+        }
+        
+        /* Responsive Grid */
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .status-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
         }
         
         /* Print Styles */
@@ -164,172 +227,302 @@
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 min-h-screen">
-  <div class="container mx-auto px-4 py-8 max-w-7xl"><!-- Header -->
-   <header class="text-center mb-10 fade-in">
-    <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">🎓 Sistem Presensi Siswa</h1>
-    <p class="text-gray-600 text-lg">SMK Negeri 1 - Tahun Ajaran 2024/2025</p>
-   </header><!-- Tabs Navigation -->
-   <div class="flex flex-wrap justify-center gap-3 mb-8 fade-in"><button onclick="switchTab('input')" id="tab-input" class="tab-active px-6 py-3 rounded-lg font-semibold transition-all duration-300"> ✏️ Input Presensi </button> <button onclick="switchTab('recap')" id="tab-recap" class="bg-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"> 📊 Rekapitulasi Kelas </button> <button onclick="switchTab('recap-student')" id="tab-recap-student" class="bg-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"> 👤 Rekapitulasi Per Siswa </button> <button onclick="switchTab('monthly')" id="tab-monthly" class="bg-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"> 📅 Laporan Bulanan </button> <button onclick="switchTab('students')" id="tab-students" class="bg-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"> 👥 Kelola Siswa </button>
-   </div><!-- Loading Overlay -->
+ <body class="bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50 min-h-screen">
+  <div class="w-full"><!-- Modern Navbar -->
+   <nav class="navbar mb-8">
+    <div class="container mx-auto px-4">
+     <div class="flex items-center justify-between py-4"><!-- Logo & Title -->
+      <div class="flex items-center gap-3"><img src="https://i.imgur.com/UVQedhI.png" alt="Logo Sekolah" class="w-12 h-12 md:w-16 md:h-16 object-contain" onerror="this.style.display='none';">
+       <div>
+        <h1 class="text-white text-xl md:text-2xl font-bold">Sistem Presensi Siswa</h1>
+        <p class="text-blue-100 text-xs md:text-sm" id="school-header">SMK Negeri 4 Jakarta - 2024/2025</p>
+       </div>
+      </div><!-- Mobile Menu Button --> <button onclick="toggleMobileMenu()" class="mobile-menu text-white p-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+       </svg></button>
+     </div><!-- Navigation Menu -->
+     <div id="nav-menu" class="nav-menu pb-4 hidden md:flex"><button onclick="switchTab('input')" id="tab-input" class="nav-item tab-active px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"> ✏️ Input </button> <button onclick="switchTab('recap')" id="tab-recap" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📊 Rekap Kelas </button> <button onclick="switchTab('recap-student')" id="tab-recap-student" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👤 Rekap Siswa </button> <button onclick="switchTab('monthly')" id="tab-monthly" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📅 Bulanan </button> <button onclick="switchTab('students')" id="tab-students" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👥 Kelola Siswa </button> <button onclick="switchTab('templates')" id="tab-templates" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📋 Template </button> <button onclick="switchTab('settings')" id="tab-settings" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> ⚙️ Pengaturan </button>
+     </div>
+    </div>
+   </nav><!-- Loading Overlay -->
    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-2xl p-8 flex flex-col items-center">
-     <div class="loading-spinner"></div>
+    <div class="bg-white rounded-2xl p-8 flex flex-col items-center"><img src="https://i.imgur.com/UVQedhI.png" alt="Loading..." class="loading-spinner" onerror="this.style.display='none';">
      <p class="mt-4 text-gray-700 font-semibold">Memuat data...</p>
     </div>
-   </div><!-- Tab Content: Input Presensi -->
-   <div id="content-input" class="tab-content fade-in">
-    <div class="card p-8 mb-6">
-     <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 Input Presensi Harian</h2>
-     <div class="grid md:grid-cols-2 gap-6 mb-6">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="input-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="">-- Pilih Kelas --</option> </select>
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label> <input type="date" id="input-date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all">
-      </div>
-     </div><button onclick="loadStudentsForAttendance()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full md:w-auto"> 🔍 Tampilkan Siswa </button>
-    </div>
-    <div id="attendance-form-container" class="hidden">
-     <div class="card p-8">
-      <h3 class="text-xl font-bold text-gray-800 mb-6">Daftar Siswa</h3>
-      <div id="students-attendance-list" class="space-y-3"></div><button onclick="saveAttendance()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-6"> 💾 Simpan Presensi </button>
-     </div>
-    </div>
-   </div><!-- Tab Content: Rekapitulasi -->
-   <div id="content-recap" class="tab-content hidden">
-    <div class="card p-8 mb-6">
-     <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Rekapitulasi Per Siswa</h2>
-     <div class="grid md:grid-cols-3 gap-6 mb-6">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="recap-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="">Semua Kelas</option> </select>
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recap-period" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="all">Semua Periode</option> <option value="sem1">Semester 1 (Jul-Des)</option> <option value="sem2">Semester 2 (Jan-Jun)</option> </select>
-      </div>
-      <div class="flex items-end"><button onclick="loadRecapitulation()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 📈 Tampilkan </button>
-      </div>
-     </div>
-    </div>
-    <div id="recap-stats" class="grid md:grid-cols-5 gap-4 mb-6 hidden"></div>
-    <div id="recap-table-container" class="card p-8 overflow-x-auto hidden">
-     <table class="w-full" id="recap-table">
-      <thead class="bg-gradient-to-r from-purple-50 to-pink-50">
-       <tr>
-        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">NIS</th>
-        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama Siswa</th>
-        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kelas</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Hadir</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">PKL</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Sakit</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Izin</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Alpha</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
-       </tr>
-      </thead>
-      <tbody id="recap-tbody" class="divide-y divide-gray-200"></tbody>
-     </table>
-    </div>
-   </div><!-- Tab Content: Rekapitulasi Per Siswa -->
-   <div id="content-recap-student" class="tab-content hidden">
-    <div class="card p-8 mb-6">
-     <h2 class="text-2xl font-bold text-gray-800 mb-6">👤 Rekapitulasi Presensi Per Siswa</h2>
-     <div class="grid md:grid-cols-3 gap-6 mb-6">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="recap-student-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="">-- Pilih Kelas --</option> </select>
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recap-student-period" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="all">Semua Periode</option> <option value="sem1">Semester 1 (Jul-Des)</option> <option value="sem2">Semester 2 (Jan-Jun)</option> <option value="custom">Custom Periode</option> </select>
-      </div>
-      <div class="flex items-end"><button onclick="loadStudentRecapList()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 🔍 Tampilkan Siswa </button>
-      </div>
-     </div>
-     <div id="custom-period-fields" class="hidden grid md:grid-cols-2 gap-6 mb-6">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Dari Tanggal</label> <input type="date" id="recap-student-start" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all">
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Sampai Tanggal</label> <input type="date" id="recap-student-end" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all">
-      </div>
-     </div>
-    </div>
-    <div id="student-cards-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
-   </div><!-- A4 Preview Modal -->
-   <div id="a4-preview-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-     <div class="p-6 bg-gray-100 no-print">
-      <div class="flex justify-between items-center mb-4">
-       <h3 class="text-xl font-bold text-gray-800">📄 Preview Rekapitulasi A4</h3><button onclick="closeA4Preview()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"> ✕ Tutup </button>
-      </div>
-      <div class="flex gap-3 mb-4"><button onclick="printA4()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"> 🖨️ Cetak </button> <button onclick="downloadPDF()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all flex items-center gap-2"> 📥 Download PDF </button>
-      </div>
-     </div>
-     <div id="print-area" class="a4-paper"></div>
-    </div>
-   </div><!-- Tab Content: Laporan Bulanan -->
-   <div id="content-monthly" class="tab-content hidden">
-    <div class="card p-8 mb-6">
-     <h2 class="text-2xl font-bold text-gray-800 mb-6">📅 Laporan Bulanan</h2>
-     <div class="grid md:grid-cols-3 gap-6 mb-6">
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Bulan</label> <select id="monthly-month" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="01">Januari</option> <option value="02">Februari</option> <option value="03">Maret</option> <option value="04">April</option> <option value="05">Mei</option> <option value="06">Juni</option> <option value="07">Juli</option> <option value="08">Agustus</option> <option value="09">September</option> <option value="10">Oktober</option> <option value="11">November</option> <option value="12">Desember</option> </select>
-      </div>
-      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tahun</label> <select id="monthly-year" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"> <option value="2025">2025</option> <option value="2024">2024</option> </select>
-      </div>
-      <div class="flex items-end"><button onclick="loadMonthlyReport()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 📊 Tampilkan </button>
-      </div>
-     </div>
-    </div>
-    <div id="monthly-summary" class="grid md:grid-cols-4 gap-4 mb-6 hidden"></div>
-    <div id="monthly-table-container" class="card p-8 overflow-x-auto hidden">
-     <div class="mb-4">
-      <h3 class="text-xl font-bold text-gray-800" id="monthly-title"></h3>
-     </div>
-     <table class="w-full" id="monthly-table">
-      <thead class="bg-gradient-to-r from-purple-50 to-pink-50">
-       <tr>
-        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tanggal</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Hadir</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">PKL</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Sakit</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Izin</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Alpha</th>
-        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
-       </tr>
-      </thead>
-      <tbody id="monthly-tbody" class="divide-y divide-gray-200"></tbody>
-     </table>
-    </div>
-   </div><!-- Tab Content: Kelola Siswa -->
-   <div id="content-students" class="tab-content hidden">
-    <div class="card p-8 mb-6">
-     <h2 class="text-2xl font-bold text-gray-800 mb-6">👥 Kelola Data Siswa</h2><button onclick="showAddStudentForm()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold mb-6"> ➕ Tambah Siswa Baru </button>
-     <div id="add-student-form" class="hidden bg-purple-50 p-6 rounded-lg mb-6">
-      <h3 class="text-lg font-bold text-gray-800 mb-4">Form Tambah Siswa</h3>
-      <div class="grid md:grid-cols-2 gap-4">
-       <div><label class="block text-sm font-semibold text-gray-700 mb-2">NIS</label> <input type="text" id="new-nis" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Contoh: 2024001">
+   </div><!-- Content Wrapper -->
+   <div class="container mx-auto px-4 py-6 max-w-7xl"><!-- Tab Content: Input Presensi -->
+    <div id="content-input" class="tab-content fade-in">
+     <div class="card p-4 md:p-8 mb-6">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">📝 Input Presensi Harian</h2>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="input-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="">-- Pilih Kelas --</option> </select>
        </div>
-       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label> <input type="text" id="new-name" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nama Siswa">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label> <input type="date" id="input-date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all">
        </div>
-       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin</label> <select id="new-gender" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"> <option value="L">Laki-laki</option> <option value="P">Perempuan</option> </select>
+      </div><button onclick="loadStudentsForAttendance()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full md:w-auto"> 🔍 Tampilkan Siswa </button>
+     </div>
+     <div id="attendance-form-container" class="hidden">
+      <div class="card p-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-6">Daftar Siswa</h3>
+       <div id="students-attendance-list" class="space-y-3"></div><button onclick="saveAttendance()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold mt-6"> 💾 Simpan Presensi </button>
+      </div>
+     </div>
+    </div><!-- Tab Content: Rekapitulasi -->
+    <div id="content-recap" class="tab-content hidden">
+     <div class="card p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Rekapitulasi Per Siswa</h2>
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="recap-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="">Semua Kelas</option> </select>
        </div>
-       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label> <input type="text" id="new-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Contoh: X - TKJ-1">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label> <select id="recap-period" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="all">Semua Periode</option> <option value="sem1">Semester 1 (Jul-Des)</option> <option value="sem2">Semester 2 (Jan-Jun)</option> </select>
+       </div>
+       <div class="flex items-end"><button onclick="loadRecapitulation()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 📈 Tampilkan </button>
        </div>
       </div>
-      <div class="flex gap-3 mt-4"><button onclick="saveNewStudent()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold"> 💾 Simpan </button> <button onclick="cancelAddStudent()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-all"> ❌ Batal </button>
-      </div>
      </div>
-     <div class="mb-4"><label class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas</label> <select id="students-class-filter" onchange="loadStudentsList()" class="w-full md:w-64 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"> <option value="">Semua Kelas</option> </select>
-     </div>
-     <div class="overflow-x-auto">
-      <table class="w-full">
-       <thead class="bg-gradient-to-r from-purple-50 to-pink-50">
+     <div id="recap-stats" class="grid md:grid-cols-5 gap-4 mb-6 hidden"></div>
+     <div id="recap-table-container" class="card p-8 overflow-x-auto hidden">
+      <table class="w-full" id="recap-table">
+       <thead class="bg-gradient-to-r from-blue-50 to-cyan-50">
         <tr>
          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">NIS</th>
-         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
-         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">L/P</th>
+         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama Siswa</th>
          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kelas</th>
-         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Hadir</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">PKL</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Sakit</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Izin</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Alpha</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
         </tr>
        </thead>
-       <tbody id="students-tbody" class="divide-y divide-gray-200"></tbody>
+       <tbody id="recap-tbody" class="divide-y divide-gray-200"></tbody>
       </table>
      </div>
+    </div><!-- Tab Content: Rekapitulasi Per Siswa -->
+    <div id="content-recap-student" class="tab-content hidden">
+     <div class="card p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">👤 Rekapitulasi Presensi Per Siswa (Per Bulan)</h2>
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="recap-student-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="">-- Pilih Kelas --</option> </select>
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tahun</label> <select id="recap-student-year" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="2025">2025</option> <option value="2024">2024</option> </select>
+       </div>
+       <div class="flex items-end"><button onclick="loadStudentRecapList()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 🔍 Tampilkan Siswa </button>
+       </div>
+      </div>
+     </div>
+     <div id="student-cards-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+    </div><!-- A4 Preview Modal -->
+    <div id="a4-preview-modal" class="modal-overlay hidden">
+     <div class="modal-content">
+      <div class="p-6 bg-gray-100 no-print">
+       <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800">📄 Preview Rekapitulasi A4</h3><button onclick="closeA4Preview()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"> ✖ Tutup </button>
+       </div>
+       <div class="flex gap-3 mb-4"><button onclick="printA4()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"> 🖨️ Cetak </button> <button onclick="downloadPDF()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all flex items-center gap-2"> 📥 Download PDF </button>
+       </div>
+      </div>
+      <div id="print-area" class="a4-paper"></div>
+     </div>
+    </div><!-- Delete By Class Modal -->
+    <div id="delete-class-modal" class="modal-overlay hidden">
+     <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+      <div class="text-center mb-6">
+       <div class="text-6xl mb-4">
+        ⚠️
+       </div>
+       <h3 class="text-2xl font-bold text-gray-800 mb-2">Hapus Siswa Per Jurusan</h3>
+       <p class="text-gray-600">Pilih kelas yang ingin dihapus. Tindakan ini tidak dapat dibatalkan!</p>
+      </div>
+      <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label> <select id="delete-class-select" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"> <option value="">-- Pilih Kelas --</option> </select>
+      </div>
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+       <p class="text-sm text-red-800"><strong>⚠️ Peringatan:</strong> Semua siswa di kelas terpilih akan dihapus permanen beserta semua data presensi mereka!</p>
+      </div>
+      <div class="flex gap-3"><button onclick="confirmDeleteByClass()" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"> 🗑️ Hapus Kelas </button> <button onclick="closeDeleteClassModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all"> ❌ Batal </button>
+      </div>
+     </div>
+    </div><!-- Delete All Modal -->
+    <div id="delete-all-modal" class="modal-overlay hidden">
+     <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+      <div class="text-center mb-6">
+       <div class="text-6xl mb-4">
+        🚨
+       </div>
+       <h3 class="text-2xl font-bold text-red-600 mb-2">HAPUS SEMUA SISWA?</h3>
+       <p class="text-gray-600">Ini akan menghapus <strong>SEMUA DATA SISWA</strong> dan <strong>SEMUA PRESENSI</strong> secara permanen!</p>
+      </div>
+      <div class="bg-red-100 border-2 border-red-500 p-4 mb-6 rounded-lg">
+       <p class="text-sm text-red-900 font-semibold text-center">⚠️ PERINGATAN KERAS ⚠️</p>
+       <p class="text-sm text-red-800 mt-2">Tindakan ini TIDAK DAPAT DIBATALKAN dan akan menghapus seluruh database siswa!</p>
+      </div>
+      <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">Ketik <span class="text-red-600 font-bold">HAPUS SEMUA</span> untuk konfirmasi:</label> <input type="text" id="delete-all-confirmation" class="w-full px-4 py-3 border-2 border-red-300 rounded-lg focus:border-red-500 focus:outline-none" placeholder="Ketik: HAPUS SEMUA">
+      </div>
+      <div class="flex gap-3"><button onclick="confirmDeleteAll()" class="flex-1 bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg font-semibold transition-all"> 🗑️ Hapus Semua </button> <button onclick="closeDeleteAllModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all"> ❌ Batal </button>
+      </div>
+     </div>
+    </div><!-- Tab Content: Laporan Bulanan -->
+    <div id="content-monthly" class="tab-content hidden">
+     <div class="card p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">📅 Laporan Bulanan</h2>
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Bulan</label> <select id="monthly-month" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="01">Januari</option> <option value="02">Februari</option> <option value="03">Maret</option> <option value="04">April</option> <option value="05">Mei</option> <option value="06">Juni</option> <option value="07">Juli</option> <option value="08">Agustus</option> <option value="09">September</option> <option value="10">Oktober</option> <option value="11">November</option> <option value="12">Desember</option> </select>
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tahun</label> <select id="monthly-year" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-all"> <option value="2025">2025</option> <option value="2024">2024</option> </select>
+       </div>
+       <div class="flex items-end"><button onclick="loadMonthlyReport()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold w-full"> 📊 Tampilkan </button>
+       </div>
+      </div>
+     </div>
+     <div id="monthly-summary" class="grid md:grid-cols-4 gap-4 mb-6 hidden"></div>
+     <div id="monthly-table-container" class="card p-8 overflow-x-auto hidden">
+      <div class="mb-4">
+       <h3 class="text-xl font-bold text-gray-800" id="monthly-title"></h3>
+      </div>
+      <table class="w-full" id="monthly-table">
+       <thead class="bg-gradient-to-r from-blue-50 to-cyan-50">
+        <tr>
+         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tanggal</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Hadir</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">PKL</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Sakit</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Izin</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Alpha</th>
+         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
+        </tr>
+       </thead>
+       <tbody id="monthly-tbody" class="divide-y divide-gray-200"></tbody>
+      </table>
+     </div>
+    </div><!-- Tab Content: Template Data Siswa -->
+    <div id="content-templates" class="tab-content hidden">
+     <div class="card p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">📋 Template Data Siswa</h2>
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded-lg">
+       <h3 class="text-lg font-bold text-blue-800 mb-3">📝 Cara Menggunakan Template:</h3>
+       <ol class="list-decimal list-inside space-y-2 text-gray-700">
+        <li>Download template Excel di bawah ini</li>
+        <li>Isi data siswa sesuai format yang tersedia (NIS, Nama, L/P, Kelas)</li>
+        <li>Simpan file Excel Anda</li>
+        <li>Upload kembali file yang sudah diisi</li>
+        <li>Sistem akan otomatis import data siswa ke database</li>
+       </ol>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6"><!-- Download Template -->
+       <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200">
+        <div class="flex items-center justify-between mb-4">
+         <div>
+          <h3 class="text-xl font-bold text-green-800">📥 Download Template</h3>
+          <p class="text-sm text-gray-600 mt-1">Template kosong untuk diisi</p>
+         </div>
+         <div class="text-5xl">
+          📊
+         </div>
+        </div><button onclick="downloadTemplate()" class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"> 📥 Download Template Excel </button>
+       </div><!-- Upload Template -->
+       <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border-2 border-blue-200">
+        <div class="flex items-center justify-between mb-4">
+         <div>
+          <h3 class="text-xl font-bold text-blue-800">📤 Upload Data Siswa</h3>
+          <p class="text-sm text-gray-600 mt-1">Import dari file Excel</p>
+         </div>
+         <div class="text-5xl">
+          ⬆️
+         </div>
+        </div><input type="file" id="excel-file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileUpload(event)"> <button onclick="document.getElementById('excel-file').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"> 📤 Pilih File Excel </button>
+       </div>
+      </div><!-- Preview Import -->
+      <div id="import-preview" class="hidden mt-6">
+       <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg mb-4">
+        <h3 class="text-lg font-bold text-yellow-800 mb-2">👀 Preview Data Import</h3>
+        <p class="text-sm text-gray-700">Periksa data di bawah ini sebelum menyimpan ke database</p>
+       </div>
+       <div class="overflow-x-auto mb-4">
+        <table class="w-full">
+         <thead class="bg-gradient-to-r from-blue-50 to-cyan-50">
+          <tr>
+           <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">No</th>
+           <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">NIS</th>
+           <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Nama</th>
+           <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">L/P</th>
+           <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Kelas</th>
+           <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Status</th>
+          </tr>
+         </thead>
+         <tbody id="import-tbody"></tbody>
+        </table>
+       </div>
+       <div class="flex gap-3"><button onclick="saveImportedData()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold"> 💾 Simpan ke Database </button> <button onclick="cancelImport()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-all"> ❌ Batal </button>
+       </div>
+      </div>
+     </div>
+    </div><!-- Tab Content: Pengaturan Sekolah -->
+    <div id="content-settings" class="tab-content hidden">
+     <div class="card p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">⚙️ Pengaturan Sekolah</h2>
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded-lg">
+       <p class="text-gray-700"><strong>ℹ️ Info:</strong> Pengaturan ini akan muncul pada semua laporan dan dokumen yang dicetak</p>
+      </div>
+      <div class="space-y-6">
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nama Sekolah</label> <input type="text" id="setting-school-name" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: SMK Negeri 4 Jakarta">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Tahun Ajaran</label> <input type="text" id="setting-academic-year" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: 2024/2025">
+       </div>
+       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Sekolah</label> <input type="text" id="setting-address" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: Jl. Pendidikan No. 123, Jakarta Selatan">
+       </div>
+       <div class="grid md:grid-cols-2 gap-6">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Telepon</label> <input type="text" id="setting-phone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: (021) 12345678">
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Email Sekolah</label> <input type="email" id="setting-email" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: info@smkn4jakarta.sch.id">
+        </div>
+       </div>
+       <div class="flex gap-3 pt-4"><button onclick="saveSettings()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold"> 💾 Simpan Pengaturan </button> <button onclick="resetSettings()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-all"> 🔄 Reset ke Default </button>
+       </div>
+      </div>
+     </div>
+    </div><!-- Tab Content: Kelola Siswa -->
+    <div id="content-students" class="tab-content hidden">
+     <div class="card p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">👥 Kelola Data Siswa</h2>
+      <div class="flex flex-wrap gap-3 mb-6"><button onclick="showAddStudentForm()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold"> ➕ Tambah Siswa Baru </button> <button onclick="showDeleteByClassModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all"> 🗑️ Hapus Per Jurusan </button> <button onclick="showDeleteAllModal()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"> ⚠️ Hapus Semua Siswa </button>
+      </div>
+      <div id="add-student-form" class="hidden bg-blue-50 p-6 rounded-lg mb-6">
+       <h3 class="text-lg font-bold text-gray-800 mb-4">Form Tambah Siswa</h3>
+       <div class="grid md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">NIS</label> <input type="text" id="new-nis" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: 2024001">
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label> <input type="text" id="new-name" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Nama Siswa">
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin</label> <select id="new-gender" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"> <option value="L">Laki-laki</option> <option value="P">Perempuan</option> </select>
+        </div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label> <input type="text" id="new-class" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: X - TKJ-1">
+        </div>
+       </div>
+       <div class="flex gap-3 mt-4"><button onclick="saveNewStudent()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold"> 💾 Simpan </button> <button onclick="cancelAddStudent()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-all"> ❌ Batal </button>
+       </div>
+      </div>
+      <div class="mb-4"><label class="block text-sm font-semibold text-gray-700 mb-2">Filter Kelas</label> <select id="students-class-filter" onchange="loadStudentsList()" class="w-full md:w-64 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"> <option value="">Semua Kelas</option> </select>
+      </div>
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="bg-gradient-to-r from-blue-50 to-cyan-50">
+         <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">NIS</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">L/P</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kelas</th>
+          <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</th>
+         </tr>
+        </thead>
+        <tbody id="students-tbody" class="divide-y divide-gray-200"></tbody>
+       </table>
+      </div>
+     </div>
     </div>
-   </div>
-  </div>
+   </div><!-- End Content Wrapper -->
+  </div><!-- End Main Wrapper -->
   <script>
         // ========================================================================
         // SUPABASE CONFIGURATION - CREDENTIALS YANG BENAR
@@ -348,6 +541,16 @@
         // ========================================================================
         let currentStudents = [];
         let allClasses = [];
+        let importedStudents = [];
+        
+        // School Settings dengan default values
+        let schoolSettings = {
+            schoolName: 'SMK Negeri 4 Jakarta',
+            academicYear: '2024/2025',
+            address: 'Jl. Pendidikan No. 123, Jakarta Selatan',
+            phone: '(021) 12345678',
+            email: 'info@smkn4jakarta.sch.id'
+        };
 
         // ========================================================================
         // UTILITY FUNCTIONS
@@ -399,7 +602,8 @@
             // Remove active class from all tab buttons
             document.querySelectorAll('[id^="tab-"]').forEach(btn => {
                 btn.classList.remove('tab-active');
-                btn.classList.add('bg-white');
+                btn.classList.remove('bg-white');
+                btn.classList.add('bg-white', 'bg-opacity-20', 'text-white');
             });
             
             // Show selected tab
@@ -408,7 +612,14 @@
             // Add active class to selected tab button
             const activeBtn = document.getElementById(`tab-${tabName}`);
             activeBtn.classList.add('tab-active');
-            activeBtn.classList.remove('bg-white');
+            activeBtn.classList.remove('bg-white', 'bg-opacity-20', 'text-white');
+            
+            // Close mobile menu after selection
+            const navMenu = document.getElementById('nav-menu');
+            if (window.innerWidth < 768) {
+                navMenu.classList.remove('show');
+                navMenu.classList.add('hidden');
+            }
             
             // Load data based on tab
             if (tabName === 'input') {
@@ -423,6 +634,19 @@
             } else if (tabName === 'students') {
                 loadClassOptions();
                 loadStudentsList();
+            } else if (tabName === 'settings') {
+                loadSettings();
+            }
+        }
+        
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            if (navMenu.classList.contains('hidden')) {
+                navMenu.classList.remove('hidden');
+                navMenu.classList.add('show');
+            } else {
+                navMenu.classList.add('hidden');
+                navMenu.classList.remove('show');
             }
         }
 
@@ -527,11 +751,12 @@
                 
                 if (studentsError) throw studentsError;
                 
-                // Get existing attendance for this date
+                // Get existing attendance for this date (dengan limit 5000)
                 const { data: existingAttendance, error: attendanceError } = await supabase
                     .from('attendance')
                     .select('*')
-                    .eq('attendance_date', date);
+                    .eq('attendance_date', date)
+                    .limit(5000);
                 
                 if (attendanceError) throw attendanceError;
                 
@@ -672,7 +897,7 @@
                 const { data: students, error: studentsError } = await studentsQuery;
                 if (studentsError) throw studentsError;
                 
-                // Build query for attendance based on period
+                // Build query for attendance based on period (dengan limit 5000)
                 let attendanceQuery = supabase
                     .from('attendance')
                     .select('*');
@@ -687,7 +912,7 @@
                         .lte('attendance_date', '2025-06-30');
                 }
                 
-                const { data: attendance, error: attendanceError } = await attendanceQuery;
+                const { data: attendance, error: attendanceError } = await attendanceQuery.limit(5000);
                 if (attendanceError) throw attendanceError;
                 
                 // Calculate statistics
@@ -770,7 +995,7 @@
             
             studentStats.forEach(student => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-purple-50 transition-all';
+                row.className = 'hover:bg-blue-50 transition-all';
                 row.innerHTML = `
                     <td class="px-4 py-3 text-sm">${student.nis}</td>
                     <td class="px-4 py-3 text-sm font-semibold">${student.name}</td>
@@ -791,24 +1016,9 @@
         // ========================================================================
         let currentRecapData = null;
 
-        // Show/hide custom period fields
-        document.addEventListener('DOMContentLoaded', () => {
-            const periodSelect = document.getElementById('recap-student-period');
-            if (periodSelect) {
-                periodSelect.addEventListener('change', function() {
-                    const customFields = document.getElementById('custom-period-fields');
-                    if (this.value === 'custom') {
-                        customFields.classList.remove('hidden');
-                    } else {
-                        customFields.classList.add('hidden');
-                    }
-                });
-            }
-        });
-
         async function loadStudentRecapList() {
             const className = document.getElementById('recap-student-class').value;
-            const period = document.getElementById('recap-student-period').value;
+            const year = document.getElementById('recap-student-year').value;
             
             if (!className) {
                 showNotification('Pilih kelas terlebih dahulu!', 'error');
@@ -818,30 +1028,6 @@
             showLoading();
             
             try {
-                // Get date range based on period
-                let startDate, endDate;
-                
-                if (period === 'sem1') {
-                    startDate = '2024-07-01';
-                    endDate = '2024-12-31';
-                } else if (period === 'sem2') {
-                    startDate = '2025-01-01';
-                    endDate = '2025-06-30';
-                } else if (period === 'custom') {
-                    startDate = document.getElementById('recap-student-start').value;
-                    endDate = document.getElementById('recap-student-end').value;
-                    
-                    if (!startDate || !endDate) {
-                        showNotification('Pilih tanggal periode!', 'error');
-                        hideLoading();
-                        return;
-                    }
-                } else {
-                    // All periods
-                    startDate = '2024-01-01';
-                    endDate = '2025-12-31';
-                }
-                
                 // Get students
                 const { data: students, error: studentsError } = await supabase
                     .from('students')
@@ -852,31 +1038,43 @@
                 
                 if (studentsError) throw studentsError;
                 
-                // Get attendance for the period
+                // Get attendance for the whole year (dengan limit 5000)
                 const { data: attendance, error: attendanceError } = await supabase
                     .from('attendance')
                     .select('*')
-                    .gte('attendance_date', startDate)
-                    .lte('attendance_date', endDate)
-                    .order('attendance_date');
+                    .gte('attendance_date', `${year}-01-01`)
+                    .lte('attendance_date', `${year}-12-31`)
+                    .order('attendance_date')
+                    .limit(5000);
                 
                 if (attendanceError) throw attendanceError;
                 
-                // Process data for each student
+                // Process data for each student per month
                 const studentRecaps = students.map(student => {
                     const studentAttendance = attendance.filter(a => a.student_id === student.id);
                     
-                    const H = studentAttendance.filter(a => a.status === 'H').length;
-                    const PKL = studentAttendance.filter(a => a.status === 'PKL').length;
-                    const S = studentAttendance.filter(a => a.status === 'S').length;
-                    const I = studentAttendance.filter(a => a.status === 'I').length;
-                    const A = studentAttendance.filter(a => a.status === 'A').length;
+                    // Group by month
+                    const monthlyData = {};
+                    for (let month = 1; month <= 12; month++) {
+                        const monthStr = String(month).padStart(2, '0');
+                        const monthAttendance = studentAttendance.filter(a => 
+                            a.attendance_date.startsWith(`${year}-${monthStr}`)
+                        );
+                        
+                        monthlyData[monthStr] = {
+                            H: monthAttendance.filter(a => a.status === 'H').length,
+                            PKL: monthAttendance.filter(a => a.status === 'PKL').length,
+                            S: monthAttendance.filter(a => a.status === 'S').length,
+                            I: monthAttendance.filter(a => a.status === 'I').length,
+                            A: monthAttendance.filter(a => a.status === 'A').length,
+                            attendance: monthAttendance
+                        };
+                    }
                     
                     return {
                         student,
-                        attendance: studentAttendance,
-                        stats: { H, PKL, S, I, A, total: H + PKL + S + I + A },
-                        period: { startDate, endDate }
+                        year,
+                        monthlyData
                     };
                 });
                 
@@ -896,11 +1094,36 @@
             const container = document.getElementById('student-cards-container');
             container.innerHTML = '';
             
-            studentRecaps.forEach((recap, index) => {
-                const { student, stats } = recap;
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            studentRecaps.forEach((recap, studentIndex) => {
+                const { student, year, monthlyData } = recap;
                 
                 const card = document.createElement('div');
                 card.className = 'card p-6 hover:shadow-xl transition-all';
+                
+                let monthButtons = '';
+                for (let month = 1; month <= 12; month++) {
+                    const monthStr = String(month).padStart(2, '0');
+                    const data = monthlyData[monthStr];
+                    const total = data.H + data.PKL + data.S + data.I + data.A;
+                    
+                    monthButtons += `
+                        <button onclick="showMonthlyA4Preview(${studentIndex}, '${monthStr}')" 
+                                class="bg-gradient-to-r from-blue-100 to-cyan-100 hover:from-blue-200 hover:to-cyan-200 p-3 rounded-lg text-left transition-all hover:shadow-md">
+                            <div class="text-xs font-semibold text-blue-700 mb-1">📅 ${monthNames[month - 1].toUpperCase()} ${year}</div>
+                            <div class="flex gap-1 text-xs">
+                                <span class="text-green-600 font-bold">H:${data.H}</span>
+                                <span class="text-blue-600 font-bold">PKL:${data.PKL}</span>
+                                <span class="text-yellow-600 font-bold">S:${data.S}</span>
+                                <span class="text-indigo-600 font-bold">I:${data.I}</span>
+                                <span class="text-red-600 font-bold">A:${data.A}</span>
+                            </div>
+                        </button>
+                    `;
+                }
+                
                 card.innerHTML = `
                     <div class="flex items-start justify-between mb-4">
                         <div>
@@ -909,40 +1132,17 @@
                             <p class="text-sm text-gray-600">${student.classname} • ${student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
                         </div>
                         <div class="text-3xl">
-                            ${student.gender === 'L' ? '👨‍🎓' : '👩‍🎓'}
+                            ${student.gender === 'L' ? '👨‍🎓' : '����‍🎓'}
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-2 mb-4">
-                        <div class="bg-green-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-green-600">${stats.H}</div>
-                            <div class="text-xs text-gray-600">Hadir</div>
-                        </div>
-                        <div class="bg-blue-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-blue-600">${stats.PKL}</div>
-                            <div class="text-xs text-gray-600">PKL</div>
-                        </div>
-                        <div class="bg-yellow-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-yellow-600">${stats.S}</div>
-                            <div class="text-xs text-gray-600">Sakit</div>
-                        </div>
-                        <div class="bg-indigo-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-indigo-600">${stats.I}</div>
-                            <div class="text-xs text-gray-600">Izin</div>
-                        </div>
-                        <div class="bg-red-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-red-600">${stats.A}</div>
-                            <div class="text-xs text-gray-600">Alpha</div>
-                        </div>
-                        <div class="bg-purple-50 p-3 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-purple-600">${stats.total}</div>
-                            <div class="text-xs text-gray-600">Total</div>
-                        </div>
+                    <div class="mb-3">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Pilih Bulan untuk Cetak PDF:</h4>
                     </div>
                     
-                    <button onclick="showA4Preview(${index})" class="btn-primary text-white px-4 py-2 rounded-lg font-semibold w-full flex items-center justify-center gap-2">
-                        👁️ Preview & Cetak A4
-                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        ${monthButtons}
+                    </div>
                 `;
                 
                 container.appendChild(card);
@@ -952,13 +1152,20 @@
             window.studentRecapsData = studentRecaps;
         }
 
-        function showA4Preview(index) {
-            const recap = window.studentRecapsData[index];
+        function showMonthlyA4Preview(studentIndex, month) {
+            const recap = window.studentRecapsData[studentIndex];
             if (!recap) return;
             
-            currentRecapData = recap;
+            const { student, year, monthlyData } = recap;
+            const monthData = monthlyData[month];
+            const { H, PKL, S, I, A, attendance } = monthData;
+            const total = H + PKL + S + I + A;
             
-            const { student, stats, attendance, period } = recap;
+            currentRecapData = { student, year, month, monthData };
+            
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const monthName = monthNames[parseInt(month) - 1];
             
             // Generate A4 content
             const printArea = document.getElementById('print-area');
@@ -966,9 +1173,9 @@
                 <div style="font-family: Arial, sans-serif; color: #333;">
                     <!-- Header -->
                     <div style="text-align: center; border-bottom: 3px solid #333; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                        <h1 style="margin: 0; font-size: 24px; font-weight: bold;">SMK NEGERI 1</h1>
-                        <p style="margin: 0.25rem 0; font-size: 14px;">Jl. Pendidikan No. 123, Kota, Provinsi</p>
-                        <p style="margin: 0.25rem 0; font-size: 14px;">Telp: (021) 12345678 | Email: info@smkn1.sch.id</p>
+                        <h1 style="margin: 0; font-size: 24px; font-weight: bold;">${schoolSettings.schoolName.toUpperCase()}</h1>
+                        <p style="margin: 0.25rem 0; font-size: 14px;">${schoolSettings.address}</p>
+                        <p style="margin: 0.25rem 0; font-size: 14px;">Telp: ${schoolSettings.phone} | Email: ${schoolSettings.email}</p>
                     </div>
                     
                     <!-- Title -->
@@ -996,12 +1203,12 @@
                         </tr>
                         <tr>
                             <td style="padding: 0.25rem 0;"><strong>Periode</strong></td>
-                            <td style="padding: 0.25rem 0;">: ${formatDate(period.startDate)} s/d ${formatDate(period.endDate)}</td>
+                            <td style="padding: 0.25rem 0;">: <strong>${monthName} ${year}</strong></td>
                         </tr>
                     </table>
                     
                     <!-- Summary Stats -->
-                    <h3 style="font-size: 16px; font-weight: bold; margin: 1.5rem 0 1rem 0;">Ringkasan Kehadiran</h3>
+                    <h3 style="font-size: 16px; font-weight: bold; margin: 1.5rem 0 1rem 0;">Ringkasan Kehadiran - ${monthName} ${year}</h3>
                     <table class="print-table" style="font-size: 13px;">
                         <thead>
                             <tr>
@@ -1015,18 +1222,18 @@
                         </thead>
                         <tbody>
                             <tr style="text-align: center; font-weight: bold;">
-                                <td style="color: #16a34a; font-size: 18px;">${stats.H}</td>
-                                <td style="color: #2563eb; font-size: 18px;">${stats.PKL}</td>
-                                <td style="color: #ca8a04; font-size: 18px;">${stats.S}</td>
-                                <td style="color: #4f46e5; font-size: 18px;">${stats.I}</td>
-                                <td style="color: #dc2626; font-size: 18px;">${stats.A}</td>
-                                <td style="color: #9333ea; font-size: 18px;">${stats.total}</td>
+                                <td style="color: #16a34a; font-size: 18px;">${H}</td>
+                                <td style="color: #2563eb; font-size: 18px;">${PKL}</td>
+                                <td style="color: #ca8a04; font-size: 18px;">${S}</td>
+                                <td style="color: #4f46e5; font-size: 18px;">${I}</td>
+                                <td style="color: #dc2626; font-size: 18px;">${A}</td>
+                                <td style="color: #9333ea; font-size: 18px;">${total}</td>
                             </tr>
                         </tbody>
                     </table>
                     
                     <!-- Detail Attendance -->
-                    <h3 style="font-size: 16px; font-weight: bold; margin: 1.5rem 0 1rem 0;">Detail Presensi</h3>
+                    <h3 style="font-size: 16px; font-weight: bold; margin: 1.5rem 0 1rem 0;">Detail Presensi ${monthName} ${year}</h3>
                     ${attendance.length > 0 ? `
                     <table class="print-table" style="font-size: 12px;">
                         <thead>
@@ -1063,10 +1270,10 @@
                             `).join('')}
                         </tbody>
                     </table>
-                    ` : '<p style="text-align: center; color: #666; padding: 2rem;">Belum ada data presensi</p>'}
+                    ` : '<p style="text-align: center; color: #666; padding: 2rem;">Belum ada data presensi untuk bulan ini</p>'}
                     
                     <!-- Keterangan -->
-                    <div style="margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border-left: 4px solid #667eea; font-size: 12px;">
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border-left: 4px solid #3b82f6; font-size: 12px;">
                         <strong>Keterangan:</strong><br>
                         <strong>H</strong> = Hadir | 
                         <strong>PKL</strong> = Praktik Kerja Lapangan | 
@@ -1091,12 +1298,12 @@
                     
                     <!-- Footer -->
                     <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; text-align: center; font-size: 11px; color: #666;">
-                        Dicetak pada: ${new Date().toLocaleDateString('id-ID', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
+                        <p style="margin: 0;">Dicetak ${new Date().toLocaleDateString('id-ID', { 
+                            day: 'numeric', 
                             month: 'long', 
-                            day: 'numeric' 
-                        })}
+                            year: 'numeric' 
+                        })}</p>
+                        <p style="margin: 0.25rem 0 0 0;">Sistem dibuat Oleh Muhammad Syaeful Amin</p>
                     </div>
                 </div>
             `;
@@ -1121,12 +1328,15 @@
             
             try {
                 const element = document.getElementById('print-area');
-                const { student, period } = currentRecapData;
+                const { student, year, month } = currentRecapData;
+                
+                const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                                  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                const monthName = monthNames[parseInt(month) - 1];
                 
                 // Generate filename
                 const studentName = student.name.replace(/\s+/g, '_');
-                const periodText = `${period.startDate}_${period.endDate}`;
-                const filename = `Rekapitulasi_${studentName}_${periodText}.pdf`;
+                const filename = `Rekapitulasi_${studentName}_${monthName}_${year}.pdf`;
                 
                 // PDF options
                 const opt = {
@@ -1168,17 +1378,19 @@
             showLoading();
             
             try {
-               const startDate = `${year}-${month}-01`;
+                const startDate = `${year}-${month}-01`;
                 // Hitung tanggal terakhir bulan terpilih (28, 29, 30, atau 31) secara otomatis
                 const lastDay = new Date(year, month, 0).getDate();
                 const endDate = `${year}-${month}-${lastDay}`;
                 
+                // Ambil data dengan limit 5000
                 const { data: attendance, error } = await supabase
                     .from('attendance')
                     .select('*')
                     .gte('attendance_date', startDate)
                     .lte('attendance_date', endDate)
-                    .order('attendance_date');
+                    .order('attendance_date')
+                    .limit(5000);
                 
                 if (error) throw error;
                 
@@ -1253,7 +1465,7 @@
                 const total = day.H + day.PKL + day.S + day.I + day.A;
                 
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-purple-50 transition-all';
+                row.className = 'hover:bg-blue-50 transition-all';
                 row.innerHTML = `
                     <td class="px-4 py-3 text-sm font-semibold">${formatDate(date)}</td>
                     <td class="px-4 py-3 text-center text-sm font-semibold text-green-600">${day.H}</td>
@@ -1346,7 +1558,7 @@
                 
                 students.forEach(student => {
                     const row = document.createElement('tr');
-                    row.className = 'hover:bg-purple-50 transition-all';
+                    row.className = 'hover:bg-blue-50 transition-all';
                     row.innerHTML = `
                         <td class="px-4 py-3 text-sm">${student.nis}</td>
                         <td class="px-4 py-3 text-sm font-semibold">${student.name}</td>
@@ -1397,12 +1609,362 @@
         }
 
         // ========================================================================
+        // DELETE FUNCTIONS
+        // ========================================================================
+        function showDeleteByClassModal() {
+            // Populate class dropdown
+            const select = document.getElementById('delete-class-select');
+            select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            
+            allClasses.forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                select.appendChild(option);
+            });
+            
+            document.getElementById('delete-class-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteClassModal() {
+            document.getElementById('delete-class-modal').classList.add('hidden');
+            document.getElementById('delete-class-select').value = '';
+        }
+
+        async function confirmDeleteByClass() {
+            const className = document.getElementById('delete-class-select').value;
+            
+            if (!className) {
+                showNotification('Pilih kelas terlebih dahulu!', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Get students in this class
+                const { data: students, error: studentsError } = await supabase
+                    .from('students')
+                    .select('id')
+                    .eq('classname', className);
+                
+                if (studentsError) throw studentsError;
+                
+                if (!students || students.length === 0) {
+                    showNotification('Tidak ada siswa di kelas ini!', 'error');
+                    hideLoading();
+                    return;
+                }
+                
+                const studentIds = students.map(s => s.id);
+                
+                // Delete attendance records first
+                const { error: attendanceError } = await supabase
+                    .from('attendance')
+                    .delete()
+                    .in('student_id', studentIds);
+                
+                if (attendanceError) throw attendanceError;
+                
+                // Delete students
+                const { error: deleteError } = await supabase
+                    .from('students')
+                    .delete()
+                    .eq('classname', className);
+                
+                if (deleteError) throw deleteError;
+                
+                hideLoading();
+                showNotification(`Berhasil menghapus ${students.length} siswa dari kelas ${className}!`, 'success');
+                closeDeleteClassModal();
+                loadClassOptions();
+                loadStudentsList();
+            } catch (error) {
+                console.error('Error deleting students by class:', error);
+                showNotification('Gagal menghapus siswa!', 'error');
+                hideLoading();
+            }
+        }
+
+        function showDeleteAllModal() {
+            document.getElementById('delete-all-modal').classList.remove('hidden');
+            document.getElementById('delete-all-confirmation').value = '';
+        }
+
+        function closeDeleteAllModal() {
+            document.getElementById('delete-all-modal').classList.add('hidden');
+            document.getElementById('delete-all-confirmation').value = '';
+        }
+
+        async function confirmDeleteAll() {
+            const confirmation = document.getElementById('delete-all-confirmation').value.trim();
+            
+            if (confirmation !== 'HAPUS SEMUA') {
+                showNotification('Ketik "HAPUS SEMUA" untuk konfirmasi!', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Delete all attendance first
+                const { error: attendanceError } = await supabase
+                    .from('attendance')
+                    .delete()
+                    .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+                
+                if (attendanceError) throw attendanceError;
+                
+                // Delete all students
+                const { error: studentsError } = await supabase
+                    .from('students')
+                    .delete()
+                    .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+                
+                if (studentsError) throw studentsError;
+                
+                hideLoading();
+                showNotification('Semua data siswa dan presensi berhasil dihapus!', 'success');
+                closeDeleteAllModal();
+                
+                // Reload data
+                allClasses = [];
+                loadClassOptions();
+                loadStudentsList();
+            } catch (error) {
+                console.error('Error deleting all data:', error);
+                showNotification('Gagal menghapus data!', 'error');
+                hideLoading();
+            }
+        }
+
+        // ========================================================================
+        // TEMPLATE FUNCTIONS
+        // ========================================================================
+        function downloadTemplate() {
+            // Create sample data
+            const templateData = [
+                ['NIS', 'Nama Lengkap', 'L/P', 'Kelas'],
+                ['2024001', 'AHMAD ZAKI', 'L', 'X - TKJ-1'],
+                ['2024002', 'SITI NURHALIZA', 'P', 'X - TKJ-1'],
+                ['2024003', 'BUDI SANTOSO', 'L', 'X - RPL-1'],
+                ['', '', '', ''],
+                ['', '', '', '']
+            ];
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 15 },
+                { wch: 30 },
+                { wch: 8 },
+                { wch: 20 }
+            ];
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Data Siswa');
+            
+            // Download file
+            XLSX.writeFile(wb, 'Template_Data_Siswa.xlsx');
+            showNotification('Template berhasil didownload!', 'success');
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoading();
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                // Skip header row and process data
+                importedStudents = [];
+                for (let i = 1; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (row[0] && row[1]) { // Check if NIS and Name exist
+                        importedStudents.push({
+                            nis: String(row[0]).trim(),
+                            name: String(row[1]).trim().toUpperCase(),
+                            gender: String(row[2]).trim().toUpperCase() === 'P' ? 'P' : 'L',
+                            classname: String(row[3]).trim()
+                        });
+                    }
+                }
+                
+                if (importedStudents.length === 0) {
+                    showNotification('Tidak ada data valid di file Excel!', 'error');
+                    hideLoading();
+                    return;
+                }
+                
+                // Preview imported data
+                renderImportPreview();
+                document.getElementById('import-preview').classList.remove('hidden');
+                
+                hideLoading();
+                showNotification(`${importedStudents.length} data siswa berhasil dibaca!`, 'success');
+            } catch (error) {
+                console.error('Error reading file:', error);
+                showNotification('Gagal membaca file Excel!', 'error');
+                hideLoading();
+            }
+            
+            // Reset input
+            event.target.value = '';
+        }
+
+        function renderImportPreview() {
+            const tbody = document.getElementById('import-tbody');
+            tbody.innerHTML = '';
+            
+            importedStudents.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 transition-all';
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-center">${index + 1}</td>
+                    <td class="px-4 py-3 text-sm">${student.nis}</td>
+                    <td class="px-4 py-3 text-sm font-semibold">${student.name}</td>
+                    <td class="px-4 py-3 text-sm">${student.gender}</td>
+                    <td class="px-4 py-3 text-sm">${student.classname}</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="status-badge bg-blue-100 text-blue-800">Siap Import</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function saveImportedData() {
+            if (importedStudents.length === 0) {
+                showNotification('Tidak ada data untuk disimpan!', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const { error } = await supabase
+                    .from('students')
+                    .insert(importedStudents);
+                
+                if (error) throw error;
+                
+                hideLoading();
+                showNotification(`${importedStudents.length} siswa berhasil ditambahkan!`, 'success');
+                cancelImport();
+                loadClassOptions();
+                
+                // Switch to students tab
+                switchTab('students');
+            } catch (error) {
+                console.error('Error saving imported data:', error);
+                if (error.code === '23505') {
+                    showNotification('Ada NIS yang sudah terdaftar!', 'error');
+                } else {
+                    showNotification('Gagal menyimpan data!', 'error');
+                }
+                hideLoading();
+            }
+        }
+
+        function cancelImport() {
+            importedStudents = [];
+            document.getElementById('import-preview').classList.add('hidden');
+            document.getElementById('excel-file').value = '';
+        }
+
+        // ========================================================================
+        // SETTINGS FUNCTIONS
+        // ========================================================================
+        function loadSettings() {
+            // Load from localStorage
+            const savedSettings = localStorage.getItem('schoolSettings');
+            if (savedSettings) {
+                schoolSettings = JSON.parse(savedSettings);
+            }
+            
+            // Populate form
+            document.getElementById('setting-school-name').value = schoolSettings.schoolName;
+            document.getElementById('setting-academic-year').value = schoolSettings.academicYear;
+            document.getElementById('setting-address').value = schoolSettings.address;
+            document.getElementById('setting-phone').value = schoolSettings.phone;
+            document.getElementById('setting-email').value = schoolSettings.email;
+        }
+
+        function saveSettings() {
+            // Get values from form
+            schoolSettings = {
+                schoolName: document.getElementById('setting-school-name').value.trim(),
+                academicYear: document.getElementById('setting-academic-year').value.trim(),
+                address: document.getElementById('setting-address').value.trim(),
+                phone: document.getElementById('setting-phone').value.trim(),
+                email: document.getElementById('setting-email').value.trim()
+            };
+            
+            // Validate
+            if (!schoolSettings.schoolName || !schoolSettings.academicYear) {
+                showNotification('Nama Sekolah dan Tahun Ajaran wajib diisi!', 'error');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('schoolSettings', JSON.stringify(schoolSettings));
+            
+            // Update header
+            updateSchoolHeader();
+            
+            showNotification('Pengaturan berhasil disimpan!', 'success');
+        }
+
+        function resetSettings() {
+            // Reset to default
+            schoolSettings = {
+                schoolName: 'SMK Negeri 4 Jakarta',
+                academicYear: '2024/2025',
+                address: 'Jl. Pendidikan No. 123, Jakarta Selatan',
+                phone: '(021) 12345678',
+                email: 'info@smkn4jakarta.sch.id'
+            };
+            
+            // Save and reload form
+            localStorage.setItem('schoolSettings', JSON.stringify(schoolSettings));
+            loadSettings();
+            updateSchoolHeader();
+            
+            showNotification('Pengaturan direset ke default!', 'success');
+        }
+
+        function updateSchoolHeader() {
+            const header = document.getElementById('school-header');
+            if (header) {
+                header.textContent = `${schoolSettings.schoolName} - Tahun Ajaran ${schoolSettings.academicYear}`;
+            }
+        }
+
+        // ========================================================================
         // INITIALIZATION
         // ========================================================================
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 App initialized!');
+            
+            // Load settings from localStorage
+            const savedSettings = localStorage.getItem('schoolSettings');
+            if (savedSettings) {
+                schoolSettings = JSON.parse(savedSettings);
+            }
+            
+            // Update header with current settings
+            updateSchoolHeader();
+            
             switchTab('input');
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9acbc9b714199509',t:'MTc2NTUyNzQ3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae3eeb611f74ad7',t:'MTc2NTc4MDY0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
