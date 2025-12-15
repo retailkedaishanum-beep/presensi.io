@@ -241,7 +241,7 @@
        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
        </svg></button>
      </div><!-- Navigation Menu -->
-     <div id="nav-menu" class="nav-menu pb-4 hidden md:flex"><button onclick="switchTab('input')" id="tab-input" class="nav-item tab-active px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"> ✏️ Input </button> <button onclick="switchTab('recap')" id="tab-recap" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📊 Rekap Kelas </button> <button onclick="switchTab('recap-student')" id="tab-recap-student" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👤 Rekap Siswa </button> <button onclick="switchTab('monthly')" id="tab-monthly" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📅 Bulanan </button> <button onclick="switchTab('students')" id="tab-students" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👥 Kelola Siswa </button> <button onclick="switchTab('templates')" id="tab-templates" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📋 Template </button> <button onclick="switchTab('settings')" id="tab-settings" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> ⚙️ Pengaturan </button>
+     <div id="nav-menu" class="nav-menu pb-4 hidden md:flex"><button onclick="switchTab('input')" id="tab-input" class="nav-item tab-active px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"> ✏️ Input </button> <button onclick="switchTab('recap')" id="tab-recap" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📊 Rekap Kelas </button> <button onclick="switchTab('recap-student')" id="tab-recap-student" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👤 Rekap Siswa </button> <button onclick="switchTab('monthly')" id="tab-monthly" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📅 Bulanan </button> <button onclick="switchTab('students')" id="tab-students" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 👥 Kelola Siswa </button> <button onclick="switchTab('templates')" id="tab-templates" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> 📊 Template </button> <button onclick="switchTab('settings')" id="tab-settings" class="nav-item bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-opacity-30"> ⚙️ Pengaturan </button>
      </div>
     </div>
    </nav><!-- Loading Overlay -->
@@ -462,7 +462,7 @@
      <div class="card p-8">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">⚙️ Pengaturan Sekolah</h2>
       <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 rounded-lg">
-       <p class="text-gray-700"><strong>ℹ️ Info:</strong> Pengaturan ini akan muncul pada semua laporan dan dokumen yang dicetak</p>
+       <p class="text-gray-700"><strong>��️ Info:</strong> Pengaturan ini akan muncul pada semua laporan dan dokumen yang dicetak</p>
       </div>
       <div class="space-y-6">
        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nama Sekolah</label> <input type="text" id="setting-school-name" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Contoh: SMK Negeri 4 Jakarta">
@@ -613,6 +613,9 @@
             const activeBtn = document.getElementById(`tab-${tabName}`);
             activeBtn.classList.add('tab-active');
             activeBtn.classList.remove('bg-white', 'bg-opacity-20', 'text-white');
+            
+            // Save current tab to localStorage
+            localStorage.setItem('currentTab', tabName);
             
             // Close mobile menu after selection
             const navMenu = document.getElementById('nav-menu');
@@ -1132,7 +1135,7 @@
                             <p class="text-sm text-gray-600">${student.classname} • ${student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
                         </div>
                         <div class="text-3xl">
-                            ${student.gender === 'L' ? '👨‍🎓' : '👩🏻‍🎓'}
+                            ${student.gender === 'L' ? '👨‍🎓' : '👩‍🎓'}
                         </div>
                     </div>
                     
@@ -1993,8 +1996,10 @@
             // Update header with current settings
             updateSchoolHeader();
             
-            switchTab('input');
+            // Restore last active tab (or default to 'input')
+            const lastTab = localStorage.getItem('currentTab') || 'input';
+            switchTab(lastTab);
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae47b2981ce61bc',t:'MTc2NTc4NjQwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae4969af578ea7f',t:'MTc2NTc4NzUyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
