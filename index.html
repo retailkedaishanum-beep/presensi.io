@@ -1168,8 +1168,10 @@
             showLoading();
             
             try {
-                const startDate = `${year}-${month}-01`;
-                const endDate = `${year}-${month}-31`;
+               const startDate = `${year}-${month}-01`;
+                // Hitung tanggal terakhir bulan terpilih (28, 29, 30, atau 31) secara otomatis
+                const lastDay = new Date(year, month, 0).getDate();
+                const endDate = `${year}-${month}-${lastDay}`;
                 
                 const { data: attendance, error } = await supabase
                     .from('attendance')
